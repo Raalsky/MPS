@@ -13,7 +13,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
@@ -24,31 +23,24 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QWidget *mainWindowWidget;
-    QGroupBox *groupBox;
+    QWidget *main;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
-        MainWindow->resize(800, 621);
-        MainWindow->setMinimumSize(QSize(800, 600));
+        MainWindow->resize(1000, 621);
+        MainWindow->setMinimumSize(QSize(1000, 600));
         MainWindow->setStyleSheet(QStringLiteral("background-color: #171715;"));
         MainWindow->setDocumentMode(false);
         MainWindow->setDockOptions(QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
         MainWindow->setUnifiedTitleAndToolBarOnMac(false);
-        mainWindowWidget = new QWidget(MainWindow);
-        mainWindowWidget->setObjectName(QStringLiteral("mainWindowWidget"));
-        mainWindowWidget->setEnabled(true);
-        mainWindowWidget->setMinimumSize(QSize(800, 600));
-        groupBox = new QGroupBox(mainWindowWidget);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(260, 240, 201, 131));
-        groupBox->setAlignment(Qt::AlignCenter);
-        groupBox->setFlat(true);
-        groupBox->setCheckable(false);
-        MainWindow->setCentralWidget(mainWindowWidget);
+        main = new QWidget(MainWindow);
+        main->setObjectName(QStringLiteral("main"));
+        main->setEnabled(true);
+        main->setMinimumSize(QSize(800, 600));
+        MainWindow->setCentralWidget(main);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
         statusBar->setStyleSheet(QLatin1String("background-color: #565656;\n"
@@ -63,7 +55,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MedicalPrescriptionsSystem Client", 0));
-        groupBox->setTitle(QApplication::translate("MainWindow", "GroupBox", 0));
     } // retranslateUi
 
 };

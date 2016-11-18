@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>1000</width>
     <height>621</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
+    <width>1000</width>
     <height>600</height>
    </size>
   </property>
@@ -31,7 +31,7 @@
   <property name="unifiedTitleAndToolBarOnMac">
    <bool>false</bool>
   </property>
-  <widget class="QWidget" name="mainWindowWidget">
+  <widget class="QWidget" name="main">
    <property name="enabled">
     <bool>true</bool>
    </property>
@@ -41,28 +41,6 @@
      <height>600</height>
     </size>
    </property>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>240</y>
-      <width>201</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>GroupBox</string>
-    </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
-    </property>
-    <property name="checkable">
-     <bool>false</bool>
-    </property>
-   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="styleSheet">
