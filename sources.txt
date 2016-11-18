@@ -1,7 +1,7 @@
-https://danepubliczne.gov.pl/dataset/rejestr-podmiotow-wykonujacych-dzialalnosc-lecznicza
-https://danepubliczne.gov.pl/dataset/rejestr-hurtowni-farmaceutycznych
-https://danepubliczne.gov.pl/dataset/rejestr-aptek
-https://danepubliczne.gov.pl/dataset/rejestr-produktow-leczniczych
+[X]https://danepubliczne.gov.pl/dataset/rejestr-podmiotow-wykonujacych-dzialalnosc-lecznicza
+[X]https://danepubliczne.gov.pl/dataset/rejestr-hurtowni-farmaceutycznych
+[X]https://danepubliczne.gov.pl/dataset/rejestr-aptek
+[X]https://danepubliczne.gov.pl/dataset/rejestr-produktow-leczniczych
 https://danepubliczne.gov.pl/dataset/realizacja-budzetu-na-refundacje-lekow
 https://danepubliczne.gov.pl/dataset/leki_refundowane
 https://danepubliczne.gov.pl/dataset/rejestr-systemow-kodowania
