@@ -49,12 +49,13 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../MPS_Client/main.cpp \
-		../MPS_Client/mainwindow.cpp moc_mainwindow.cpp
+		../MPS_Client/mainwindow.cpp qrc_resources.cpp \
+		moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
+		qrc_resources.o \
 		moc_mainwindow.o
-DIST          = ../MPS_Client/layout.css \
-		../../../../Qt/5.7/clang_64/mkspecs/features/spec_pre.prf \
+DIST          = ../../../../Qt/5.7/clang_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/qdevice.pri \
 		../../../../Qt/5.7/clang_64/mkspecs/features/device_config.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/common/unix.conf \
@@ -385,6 +386,7 @@ Makefile: ../MPS_Client/MPS_Client.pro ../../../../Qt/5.7/clang_64/mkspecs/macx-
 		../../../../Qt/5.7/clang_64/mkspecs/features/yacc.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/lex.prf \
 		../MPS_Client/MPS_Client.pro \
+		../MPS_Client/resources.qrc \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/QtWidgets.prl \
 		../../../../Qt/5.7/clang_64/lib/QtGui.framework/QtGui.prl \
 		../../../../Qt/5.7/clang_64/lib/QtCore.framework/QtCore.prl
@@ -548,6 +550,7 @@ Makefile: ../MPS_Client/MPS_Client.pro ../../../../Qt/5.7/clang_64/mkspecs/macx-
 ../../../../Qt/5.7/clang_64/mkspecs/features/yacc.prf:
 ../../../../Qt/5.7/clang_64/mkspecs/features/lex.prf:
 ../MPS_Client/MPS_Client.pro:
+../MPS_Client/resources.qrc:
 ../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/QtWidgets.prl:
 ../../../../Qt/5.7/clang_64/lib/QtGui.framework/QtGui.prl:
 ../../../../Qt/5.7/clang_64/lib/QtCore.framework/QtCore.prl:
@@ -585,6 +588,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../MPS_Client/resources.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../MPS_Client/mainwindow.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../MPS_Client/main.cpp ../MPS_Client/mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../MPS_Client/mainwindow.ui $(DISTDIR)/
@@ -611,8 +615,15 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_resources.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_resources.cpp
+qrc_resources.cpp: ../MPS_Client/resources.qrc \
+		../../../../Qt/5.7/clang_64/bin/rcc \
+		../MPS_Client/assets/online.png \
+		../MPS_Client/assets/layout.css
+	/Users/raalsky/Qt/5.7/clang_64/bin/rcc -name resources ../MPS_Client/resources.qrc -o qrc_resources.cpp
+
 compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_mainwindow.cpp
@@ -639,7 +650,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -653,8 +664,17 @@ main.o: ../MPS_Client/main.cpp ../MPS_Client/mainwindow.h \
 mainwindow.o: ../MPS_Client/mainwindow.cpp ../MPS_Client/mainwindow.h \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/QMainWindow \
 		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/qmainwindow.h \
-		ui_mainwindow.h
+		ui_mainwindow.h \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/QFile \
+		../../../../Qt/5.7/clang_64/lib/QtCore.framework/Headers/qfile.h \
+		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/QLabel \
+		../../../../Qt/5.7/clang_64/lib/QtWidgets.framework/Headers/qlabel.h \
+		../../../../Qt/5.7/clang_64/lib/QtGui.framework/Headers/QPixmap \
+		../../../../Qt/5.7/clang_64/lib/QtGui.framework/Headers/qpixmap.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../MPS_Client/mainwindow.cpp
+
+qrc_resources.o: qrc_resources.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_resources.o qrc_resources.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

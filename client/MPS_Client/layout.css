@@ -1,9 +1,0 @@
-QTabWidget
-{
-	background-color: #c3c3c3;
-}
-
-QTabWidget::tab-bar
-{
-	left: 5px;
-}

@@ -13,12 +13,15 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTreeWidget>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,7 +33,20 @@ public:
     QGridLayout *gridLayout;
     QTabWidget *tabWidget;
     QWidget *tab;
-    QSlider *horizontalSlider;
+    QVBoxLayout *verticalLayout;
+    QGridLayout *gridLayout_2;
+    QFrame *frame_2;
+    QHBoxLayout *horizontalLayout_2;
+    QGridLayout *gridLayout_4;
+    QTreeWidget *treeWidget_2;
+    QFrame *frame;
+    QHBoxLayout *horizontalLayout_3;
+    QGridLayout *gridLayout_5;
+    QTreeWidget *treeWidget;
+    QFrame *frame1;
+    QHBoxLayout *horizontalLayout;
+    QGridLayout *gridLayout_3;
+    QTreeWidget *treeWidget1;
     QWidget *tab_2;
     QStatusBar *statusBar;
 
@@ -40,7 +56,7 @@ public:
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->resize(1000, 621);
         MainWindow->setMinimumSize(QSize(0, 0));
-        MainWindow->setStyleSheet(QStringLiteral("background-color: #171715;"));
+        MainWindow->setStyleSheet(QStringLiteral(""));
         MainWindow->setDocumentMode(false);
         MainWindow->setDockOptions(QMainWindow::AllowTabbedDocks|QMainWindow::AnimatedDocks);
         MainWindow->setUnifiedTitleAndToolBarOnMac(false);
@@ -54,56 +70,94 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         tabWidget = new QTabWidget(main);
         tabWidget->setObjectName(QStringLiteral("tabWidget"));
-        tabWidget->setMinimumSize(QSize(200, 200));
-        tabWidget->setStyleSheet(QLatin1String("QTabWidget::pane { /* The tab widget frame */\n"
-"    border-top: 2px solid #C2C7CB;\n"
-"}\n"
-"\n"
-"QTabWidget::tab-bar {\n"
-"    left: 5px; /* move to the right by 5px */\n"
-"	background-color: #B1B6BA;\n"
-"}\n"
-"\n"
-"/* Style the tab using the tab sub-control. Note that\n"
-"    it reads QTabBar _not_ QTabWidget */\n"
-"QTabBar::tab {\n"
-"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,\n"
-"                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);\n"
-"    border: 2px solid #C4C4C3;\n"
-"    border-bottom-color: #C2C7CB; /* same as the pane color */\n"
-"    border-top-left-radius: 4px;\n"
-"    border-top-right-radius: 4px;\n"
-"    min-width: 8ex;\n"
-"    padding: 2px;\n"
-"}\n"
-"\n"
-"QTabBar::tab:selected, QTabBar::tab:hover {\n"
-"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
-"                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,\n"
-"                                stop: 0.5 #e7e7e7, stop"
-                        ": 1.0 #fafafa);\n"
-"}\n"
-"\n"
-"QTabBar::tab:selected {\n"
-"    border-color: #9B9B9B;\n"
-"    border-bottom-color: #C2C7CB; /* same as pane color */\n"
-"}\n"
-"\n"
-"QTabBar::tab:!selected {\n"
-"    margin-top: 2px; /* make non-selected tabs look smaller */\n"
-"}"));
-        tabWidget->setTabPosition(QTabWidget::North);
-        tabWidget->setTabShape(QTabWidget::Rounded);
-        tabWidget->setElideMode(Qt::ElideRight);
-        tabWidget->setMovable(true);
+        tabWidget->setMaximumSize(QSize(13213123, 16777215));
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
-        tab->setMinimumSize(QSize(200, 200));
-        horizontalSlider = new QSlider(tab);
-        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
-        horizontalSlider->setGeometry(QRect(280, 160, 160, 22));
-        horizontalSlider->setOrientation(Qt::Horizontal);
+        verticalLayout = new QVBoxLayout(tab);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        gridLayout_2 = new QGridLayout();
+        gridLayout_2->setSpacing(6);
+        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
+        frame_2 = new QFrame(tab);
+        frame_2->setObjectName(QStringLiteral("frame_2"));
+        frame_2->setFrameShape(QFrame::StyledPanel);
+        frame_2->setFrameShadow(QFrame::Raised);
+        horizontalLayout_2 = new QHBoxLayout(frame_2);
+        horizontalLayout_2->setSpacing(6);
+        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
+        gridLayout_4 = new QGridLayout();
+        gridLayout_4->setSpacing(6);
+        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
+        treeWidget_2 = new QTreeWidget(frame_2);
+        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
+        __qtreewidgetitem->setText(0, QStringLiteral("1"));
+        treeWidget_2->setHeaderItem(__qtreewidgetitem);
+        treeWidget_2->setObjectName(QStringLiteral("treeWidget_2"));
+
+        gridLayout_4->addWidget(treeWidget_2, 0, 0, 1, 1);
+
+
+        horizontalLayout_2->addLayout(gridLayout_4);
+
+
+        gridLayout_2->addWidget(frame_2, 1, 1, 1, 1);
+
+        frame = new QFrame(tab);
+        frame->setObjectName(QStringLiteral("frame"));
+        frame->setFrameShape(QFrame::StyledPanel);
+        frame->setFrameShadow(QFrame::Raised);
+        horizontalLayout_3 = new QHBoxLayout(frame);
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        gridLayout_5 = new QGridLayout();
+        gridLayout_5->setSpacing(6);
+        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
+        treeWidget = new QTreeWidget(frame);
+        QTreeWidgetItem *__qtreewidgetitem1 = new QTreeWidgetItem();
+        __qtreewidgetitem1->setText(0, QStringLiteral("1"));
+        treeWidget->setHeaderItem(__qtreewidgetitem1);
+        treeWidget->setObjectName(QStringLiteral("treeWidget"));
+
+        gridLayout_5->addWidget(treeWidget, 0, 0, 1, 1);
+
+
+        horizontalLayout_3->addLayout(gridLayout_5);
+
+
+        gridLayout_2->addWidget(frame, 1, 2, 1, 1);
+
+        frame1 = new QFrame(tab);
+        frame1->setObjectName(QStringLiteral("frame1"));
+        frame1->setFrameShape(QFrame::StyledPanel);
+        frame1->setFrameShadow(QFrame::Raised);
+        horizontalLayout = new QHBoxLayout(frame1);
+        horizontalLayout->setSpacing(6);
+        horizontalLayout->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
+        gridLayout_3 = new QGridLayout();
+        gridLayout_3->setSpacing(6);
+        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
+        treeWidget1 = new QTreeWidget(frame1);
+        QTreeWidgetItem *__qtreewidgetitem2 = new QTreeWidgetItem();
+        __qtreewidgetitem2->setText(0, QStringLiteral("id"));
+        treeWidget1->setHeaderItem(__qtreewidgetitem2);
+        treeWidget1->setObjectName(QStringLiteral("treeWidget1"));
+
+        gridLayout_3->addWidget(treeWidget1, 0, 1, 1, 1);
+
+
+        horizontalLayout->addLayout(gridLayout_3);
+
+
+        gridLayout_2->addWidget(frame1, 1, 0, 1, 1);
+
+
+        verticalLayout->addLayout(gridLayout_2);
+
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
@@ -114,8 +168,7 @@ public:
         MainWindow->setCentralWidget(main);
         statusBar = new QStatusBar(MainWindow);
         statusBar->setObjectName(QStringLiteral("statusBar"));
-        statusBar->setStyleSheet(QLatin1String("background-color: #565656;\n"
-"border-top: 1px solid #7D7D7D;"));
+        statusBar->setStyleSheet(QStringLiteral(""));
         MainWindow->setStatusBar(statusBar);
 
         retranslateUi(MainWindow);
@@ -129,6 +182,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MedicalPrescriptionsSystem Client", 0));
+        QTreeWidgetItem *___qtreewidgetitem = treeWidget1->headerItem();
+        ___qtreewidgetitem->setText(2, QApplication::translate("MainWindow", "lastname", 0));
+        ___qtreewidgetitem->setText(1, QApplication::translate("MainWindow", "name", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
     } // retranslateUi

@@ -21,5 +21,4 @@ FORMS    += mainwindow.ui
 
 ICON = assets/icon.icns
 
-DISTFILES += \
-    layout.css
+RESOURCES     = resources.qrc
