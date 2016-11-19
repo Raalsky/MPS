@@ -19,4 +19,4 @@ HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
 
-ICON = icon.icns
+ICON = assets/icon.icns

@@ -189,6 +189,7 @@ DIST          = ../../../../Qt/5.7/clang_64/mkspecs/features/spec_pre.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/macx-clang/qmake.conf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/spec_post.prf \
+		../MPS_Client/.qmake.stash \
 		../../../../Qt/5.7/clang_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/mac/default_pre.prf \
@@ -360,6 +361,7 @@ Makefile: ../MPS_Client/MPS_Client.pro ../../../../Qt/5.7/clang_64/mkspecs/macx-
 		../../../../Qt/5.7/clang_64/mkspecs/features/qt_config.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/macx-clang/qmake.conf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		../../../../Qt/5.7/clang_64/mkspecs/features/exclusive_builds.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/default_pre.prf \
 		../../../../Qt/5.7/clang_64/mkspecs/features/mac/default_pre.prf \
@@ -522,6 +524,7 @@ Makefile: ../MPS_Client/MPS_Client.pro ../../../../Qt/5.7/clang_64/mkspecs/macx-
 ../../../../Qt/5.7/clang_64/mkspecs/features/qt_config.prf:
 ../../../../Qt/5.7/clang_64/mkspecs/macx-clang/qmake.conf:
 ../../../../Qt/5.7/clang_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 ../../../../Qt/5.7/clang_64/mkspecs/features/exclusive_builds.prf:
 ../../../../Qt/5.7/clang_64/mkspecs/features/default_pre.prf:
 ../../../../Qt/5.7/clang_64/mkspecs/features/mac/default_pre.prf:
@@ -564,10 +567,10 @@ MPS_Client.app/Contents/Info.plist:
 	@test -d MPS_Client.app/Contents || mkdir -p MPS_Client.app/Contents
 	@$(DEL_FILE) MPS_Client.app/Contents/Info.plist
 	@sed -e "s,@SHORT_VERSION@,1.0,g" -e "s,@FULL_VERSION@,1.0.0,g" -e "s,@TYPEINFO@,????,g" -e "s,@BUNDLEIDENTIFIER@,com.yourcompany.MPS-Client,g" -e "s,@ICON@,icon.icns,g" -e "s,@EXECUTABLE@,MPS_Client,g" -e "s,@LIBRARY@,MPS_Client,g" -e "s,@TYPEINFO@,????,g" ../../../../Qt/5.7/clang_64/mkspecs/macx-clang/Info.plist.app >MPS_Client.app/Contents/Info.plist
-MPS_Client.app/Contents/Resources/icon.icns: ../MPS_Client/icon.icns
+MPS_Client.app/Contents/Resources/icon.icns: ../MPS_Client/assets/icon.icns
 	@test -d MPS_Client.app/Contents/Resources/ || mkdir -p MPS_Client.app/Contents/Resources/
 	@$(DEL_FILE) MPS_Client.app/Contents/Resources/icon.icns
-	@$(COPY_FILE) ../MPS_Client/icon.icns MPS_Client.app/Contents/Resources/icon.icns
+	@$(COPY_FILE) ../MPS_Client/assets/icon.icns MPS_Client.app/Contents/Resources/icon.icns
 
 all: Makefile \
 		MPS_Client.app/Contents/PkgInfo \
