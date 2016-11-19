@@ -20,3 +20,6 @@ HEADERS  += mainwindow.h
 FORMS    += mainwindow.ui
 
 ICON = assets/icon.icns
+
+DISTFILES += \
+    layout.css

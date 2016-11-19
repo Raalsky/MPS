@@ -14,13 +14,11 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QGridLayout>
-#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHeaderView>
-#include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
 #include <QtWidgets/QStatusBar>
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QTabWidget>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -30,11 +28,10 @@ class Ui_MainWindow
 public:
     QWidget *main;
     QGridLayout *gridLayout;
-    QGroupBox *groupBox;
-    QVBoxLayout *verticalLayout;
-    QLineEdit *lineEdit;
-    QLineEdit *lineEdit_2;
-    QPushButton *pushButton;
+    QTabWidget *tabWidget;
+    QWidget *tab;
+    QSlider *horizontalSlider;
+    QWidget *tab_2;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -55,39 +52,64 @@ public:
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        groupBox = new QGroupBox(main);
-        groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setMinimumSize(QSize(300, 150));
-        groupBox->setStyleSheet(QLatin1String("background-color: #d3d3d3;\n"
-"border-radius: 10px;"));
-        groupBox->setAlignment(Qt::AlignCenter);
-        groupBox->setFlat(true);
-        verticalLayout = new QVBoxLayout(groupBox);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        verticalLayout->setContentsMargins(-1, 30, -1, -1);
-        lineEdit = new QLineEdit(groupBox);
-        lineEdit->setObjectName(QStringLiteral("lineEdit"));
-        lineEdit->setStyleSheet(QLatin1String("border: 1px solid #535353;\n"
-"border-radius: 3px;"));
+        tabWidget = new QTabWidget(main);
+        tabWidget->setObjectName(QStringLiteral("tabWidget"));
+        tabWidget->setMinimumSize(QSize(200, 200));
+        tabWidget->setStyleSheet(QLatin1String("QTabWidget::pane { /* The tab widget frame */\n"
+"    border-top: 2px solid #C2C7CB;\n"
+"}\n"
+"\n"
+"QTabWidget::tab-bar {\n"
+"    left: 5px; /* move to the right by 5px */\n"
+"	background-color: #B1B6BA;\n"
+"}\n"
+"\n"
+"/* Style the tab using the tab sub-control. Note that\n"
+"    it reads QTabBar _not_ QTabWidget */\n"
+"QTabBar::tab {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,\n"
+"                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);\n"
+"    border: 2px solid #C4C4C3;\n"
+"    border-bottom-color: #C2C7CB; /* same as the pane color */\n"
+"    border-top-left-radius: 4px;\n"
+"    border-top-right-radius: 4px;\n"
+"    min-width: 8ex;\n"
+"    padding: 2px;\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected, QTabBar::tab:hover {\n"
+"    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                stop: 0 #fafafa, stop: 0.4 #f4f4f4,\n"
+"                                stop: 0.5 #e7e7e7, stop"
+                        ": 1.0 #fafafa);\n"
+"}\n"
+"\n"
+"QTabBar::tab:selected {\n"
+"    border-color: #9B9B9B;\n"
+"    border-bottom-color: #C2C7CB; /* same as pane color */\n"
+"}\n"
+"\n"
+"QTabBar::tab:!selected {\n"
+"    margin-top: 2px; /* make non-selected tabs look smaller */\n"
+"}"));
+        tabWidget->setTabPosition(QTabWidget::North);
+        tabWidget->setTabShape(QTabWidget::Rounded);
+        tabWidget->setElideMode(Qt::ElideRight);
+        tabWidget->setMovable(true);
+        tab = new QWidget();
+        tab->setObjectName(QStringLiteral("tab"));
+        tab->setMinimumSize(QSize(200, 200));
+        horizontalSlider = new QSlider(tab);
+        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
+        horizontalSlider->setGeometry(QRect(280, 160, 160, 22));
+        horizontalSlider->setOrientation(Qt::Horizontal);
+        tabWidget->addTab(tab, QString());
+        tab_2 = new QWidget();
+        tab_2->setObjectName(QStringLiteral("tab_2"));
+        tabWidget->addTab(tab_2, QString());
 
-        verticalLayout->addWidget(lineEdit);
-
-        lineEdit_2 = new QLineEdit(groupBox);
-        lineEdit_2->setObjectName(QStringLiteral("lineEdit_2"));
-        lineEdit_2->setStyleSheet(QLatin1String("border: 1px solid #535353;\n"
-"border-radius: 3px;"));
-
-        verticalLayout->addWidget(lineEdit_2);
-
-        pushButton = new QPushButton(groupBox);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-
-        verticalLayout->addWidget(pushButton);
-
-
-        gridLayout->addWidget(groupBox, 0, 0, 1, 1, Qt::AlignHCenter|Qt::AlignVCenter);
+        gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
         MainWindow->setCentralWidget(main);
         statusBar = new QStatusBar(MainWindow);
@@ -98,16 +120,17 @@ public:
 
         retranslateUi(MainWindow);
 
+        tabWidget->setCurrentIndex(0);
+
+
         QMetaObject::connectSlotsByName(MainWindow);
     } // setupUi
 
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MedicalPrescriptionsSystem Client", 0));
-        groupBox->setTitle(QApplication::translate("MainWindow", "Logowanie", 0));
-        lineEdit->setText(QApplication::translate("MainWindow", "Login", 0));
-        lineEdit_2->setText(QApplication::translate("MainWindow", "Has\305\202o", 0));
-        pushButton->setText(QApplication::translate("MainWindow", "Zaloguj", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
     } // retranslateUi
 
 };
