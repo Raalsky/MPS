@@ -17,10 +17,11 @@
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
-#include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -34,20 +35,13 @@ public:
     QTabWidget *tabWidget;
     QWidget *tab;
     QVBoxLayout *verticalLayout;
+    QLineEdit *search;
     QGridLayout *gridLayout_2;
-    QFrame *frame_2;
-    QHBoxLayout *horizontalLayout_2;
-    QGridLayout *gridLayout_4;
-    QTreeWidget *treeWidget_2;
-    QFrame *frame;
-    QHBoxLayout *horizontalLayout_3;
-    QGridLayout *gridLayout_5;
-    QTreeWidget *treeWidget;
     QFrame *frame1;
     QHBoxLayout *horizontalLayout;
-    QGridLayout *gridLayout_3;
-    QTreeWidget *treeWidget1;
+    QListWidget *listWidget;
     QWidget *tab_2;
+    QWidget *tab_3;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -77,59 +71,14 @@ public:
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
         verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        search = new QLineEdit(tab);
+        search->setObjectName(QStringLiteral("search"));
+
+        verticalLayout->addWidget(search);
+
         gridLayout_2 = new QGridLayout();
         gridLayout_2->setSpacing(6);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        frame_2 = new QFrame(tab);
-        frame_2->setObjectName(QStringLiteral("frame_2"));
-        frame_2->setFrameShape(QFrame::StyledPanel);
-        frame_2->setFrameShadow(QFrame::Raised);
-        horizontalLayout_2 = new QHBoxLayout(frame_2);
-        horizontalLayout_2->setSpacing(6);
-        horizontalLayout_2->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_2->setObjectName(QStringLiteral("horizontalLayout_2"));
-        gridLayout_4 = new QGridLayout();
-        gridLayout_4->setSpacing(6);
-        gridLayout_4->setObjectName(QStringLiteral("gridLayout_4"));
-        treeWidget_2 = new QTreeWidget(frame_2);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QStringLiteral("1"));
-        treeWidget_2->setHeaderItem(__qtreewidgetitem);
-        treeWidget_2->setObjectName(QStringLiteral("treeWidget_2"));
-
-        gridLayout_4->addWidget(treeWidget_2, 0, 0, 1, 1);
-
-
-        horizontalLayout_2->addLayout(gridLayout_4);
-
-
-        gridLayout_2->addWidget(frame_2, 1, 1, 1, 1);
-
-        frame = new QFrame(tab);
-        frame->setObjectName(QStringLiteral("frame"));
-        frame->setFrameShape(QFrame::StyledPanel);
-        frame->setFrameShadow(QFrame::Raised);
-        horizontalLayout_3 = new QHBoxLayout(frame);
-        horizontalLayout_3->setSpacing(6);
-        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
-        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
-        gridLayout_5 = new QGridLayout();
-        gridLayout_5->setSpacing(6);
-        gridLayout_5->setObjectName(QStringLiteral("gridLayout_5"));
-        treeWidget = new QTreeWidget(frame);
-        QTreeWidgetItem *__qtreewidgetitem1 = new QTreeWidgetItem();
-        __qtreewidgetitem1->setText(0, QStringLiteral("1"));
-        treeWidget->setHeaderItem(__qtreewidgetitem1);
-        treeWidget->setObjectName(QStringLiteral("treeWidget"));
-
-        gridLayout_5->addWidget(treeWidget, 0, 0, 1, 1);
-
-
-        horizontalLayout_3->addLayout(gridLayout_5);
-
-
-        gridLayout_2->addWidget(frame, 1, 2, 1, 1);
-
         frame1 = new QFrame(tab);
         frame1->setObjectName(QStringLiteral("frame1"));
         frame1->setFrameShape(QFrame::StyledPanel);
@@ -138,19 +87,24 @@ public:
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        gridLayout_3 = new QGridLayout();
-        gridLayout_3->setSpacing(6);
-        gridLayout_3->setObjectName(QStringLiteral("gridLayout_3"));
-        treeWidget1 = new QTreeWidget(frame1);
-        QTreeWidgetItem *__qtreewidgetitem2 = new QTreeWidgetItem();
-        __qtreewidgetitem2->setText(0, QStringLiteral("id"));
-        treeWidget1->setHeaderItem(__qtreewidgetitem2);
-        treeWidget1->setObjectName(QStringLiteral("treeWidget1"));
+        listWidget = new QListWidget(frame1);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        new QListWidgetItem(listWidget);
+        listWidget->setObjectName(QStringLiteral("listWidget"));
 
-        gridLayout_3->addWidget(treeWidget1, 0, 1, 1, 1);
-
-
-        horizontalLayout->addLayout(gridLayout_3);
+        horizontalLayout->addWidget(listWidget);
 
 
         gridLayout_2->addWidget(frame1, 1, 0, 1, 1);
@@ -162,6 +116,9 @@ public:
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
         tabWidget->addTab(tab_2, QString());
+        tab_3 = new QWidget();
+        tab_3->setObjectName(QStringLiteral("tab_3"));
+        tabWidget->addTab(tab_3, QString());
 
         gridLayout->addWidget(tabWidget, 0, 0, 1, 1);
 
@@ -182,11 +139,42 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MedicalPrescriptionsSystem Client", 0));
-        QTreeWidgetItem *___qtreewidgetitem = treeWidget1->headerItem();
-        ___qtreewidgetitem->setText(2, QApplication::translate("MainWindow", "lastname", 0));
-        ___qtreewidgetitem->setText(1, QApplication::translate("MainWindow", "name", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Tab 1", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Tab 2", 0));
+
+        const bool __sortingEnabled = listWidget->isSortingEnabled();
+        listWidget->setSortingEnabled(false);
+        QListWidgetItem *___qlistwidgetitem = listWidget->item(0);
+        ___qlistwidgetitem->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem1 = listWidget->item(1);
+        ___qlistwidgetitem1->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem2 = listWidget->item(2);
+        ___qlistwidgetitem2->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem3 = listWidget->item(3);
+        ___qlistwidgetitem3->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem4 = listWidget->item(4);
+        ___qlistwidgetitem4->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem5 = listWidget->item(5);
+        ___qlistwidgetitem5->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem6 = listWidget->item(6);
+        ___qlistwidgetitem6->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem7 = listWidget->item(7);
+        ___qlistwidgetitem7->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem8 = listWidget->item(8);
+        ___qlistwidgetitem8->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem9 = listWidget->item(9);
+        ___qlistwidgetitem9->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem10 = listWidget->item(10);
+        ___qlistwidgetitem10->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
+        QListWidgetItem *___qlistwidgetitem11 = listWidget->item(11);
+        ___qlistwidgetitem11->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem12 = listWidget->item(12);
+        ___qlistwidgetitem12->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        QListWidgetItem *___qlistwidgetitem13 = listWidget->item(13);
+        ___qlistwidgetitem13->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
+        listWidget->setSortingEnabled(__sortingEnabled);
+
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Pracownicy", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Pacjenci", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MainWindow", "Apteki", 0));
     } // retranslateUi
 
 };

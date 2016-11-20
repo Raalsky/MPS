@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //ui->statusBar->showMessage("Offline");
 
-    QTreeWidget * tree = ui->treeWidget;
+    /*QTreeWidget * tree = ui->treeWidget;
 
     QTreeWidgetItem * topLevel = new QTreeWidgetItem();
     topLevel->setText(0, "This is top level");
@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
         topLevel->addChild(item);
     }
 
-    tree->addTopLevelItem(topLevel);
+    tree->addTopLevelItem(topLevel);*/
 
     QPixmap img(":/assets/online.png");
     QLabel *label = new QLabel(this);
@@ -40,6 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->statusBar->addWidget(label);
     ui->statusBar->addWidget(status);
+
+    ui->search->setAttribute(Qt::WA_MacShowFocusRect, 0);
 }
 
 MainWindow::~MainWindow()

@@ -621,6 +621,7 @@ compiler_rcc_clean:
 qrc_resources.cpp: ../MPS_Client/resources.qrc \
 		../../../../Qt/5.7/clang_64/bin/rcc \
 		../MPS_Client/assets/online.png \
+		../MPS_Client/assets/search.png \
 		../MPS_Client/assets/layout.css
 	/Users/raalsky/Qt/5.7/clang_64/bin/rcc -name resources ../MPS_Client/resources.qrc -o qrc_resources.cpp
 

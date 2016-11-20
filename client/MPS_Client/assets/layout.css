@@ -1,55 +1,108 @@
 QMainWindow {
     background-color: #171715;
+    padding-top: 10px;
+    font-family: GillSans, Calibri, Trebuchet, sans-serif;
 }
 
 QStatusBar {
     background-color: #565656;
     border-top: 1px solid #7D7D7D;
+}
+
+QStatusBar QLabel {
+    font-family: GillSans, Calibri, Trebuchet, sans-serif;
+    font-size: 11px;
     color: #c3c3c3;
-    font-size: 10px;
-    font-family: Arial;
-    padding-left: 10px;
+    padding-bottom: 1px;
+    padding-left: 3px;
+}
+
+QTabWidget {
+    padding-top: 10px;
 }
 
 QTabWidget::pane {
-    border-top: 2px solid #C2C7CB;
+    border-top: 1px solid #50514C;
     background-color: #272822;
     border-radius: 5px;
 }
 
 QTabWidget::tab-bar {
-    left: 5px;
-    background-color: #B1B6BA;
+    left: 0px;
+    background-color: #50514C;
 }
 
 QTabBar::tab {
-    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #E1E1E1, stop: 0.4 #DDDDDD,
-                                stop: 0.5 #D8D8D8, stop: 1.0 #D3D3D3);
-    border: 2px solid #C4C4C3;
-    border-bottom-color: #C2C7CB;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    min-width: 8ex;
-    padding: 2px;
+    /* background: #252525; */
+    border: none;
+    /* border-radius: 5px; */
+    padding: 10px 30px;
+    color: #939393;
+    font-size: 14px;
+    font-family: GillSans, Calibri, Trebuchet, sans-serif;
+    margin-top: 15px;
+    margin-right: 10px;
+    margin-left: 4px;
+    margin-bottom: 15px;
 }
 
-QTabBar::tab:selected, QTabBar::tab:hover {
+QTabBar::tab:selected
+{
+    background-color: #3C3C3A;
+    color: #c3c3c3;
+    border-bottom: 4px solid #c3c3c3;
+}
+
+/*QTabBar::tab:selected, QTabBar::tab:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #fafafa, stop: 0.4 #f4f4f4,
                                 stop: 0.5 #e7e7e7, stop: 1.0 #fafafa);
-}
+}*/
 
 QTabBar::tab:selected {
     border-color: #9B9B9B;
     border-bottom-color: #C2C7CB;
 }
 
-QTabBar::tab:!selected {
+/*QTabBar::tab:!selected {
     margin-top: 2px;
-}
+}*/
 
-QFrame#frame1 {
+QFrame#frame1, QFrame#frame2, QFrame#frame3 {
     border: 1px solid #50514C;
     border-radius: 3px;
+}
+
+QLineEdit#search {
+    border-radius: 18px;
+    padding: 10px 20px;
+    font-size: 11px;
+    outline: none;
+    padding-right: 35px;
+    background-image: url(":assets/search.png");
+    background-repeat: none;
+    background-attachment: fixed;
+    background-position: right center;
+}
+
+QLineEdit#search:focus {
+    border: none;
+    outline: none;
+}
+
+QListWidget {
+    outline: none;
+    border: none;
+    background-color: #171715;
+}
+
+QListWidget:focused, QListWidget:selected {
+    outline: none;
+    border: none;
+}
+
+QListWidget::item {
+    background-color: #f3f3f3;
+    padding: 10px 20px;
+    border-bottom: 1px solid #c3c3c3;
 }

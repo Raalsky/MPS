@@ -55,61 +55,14 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Tab 1</string>
+        <string>Pracownicy</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
+         <widget class="QLineEdit" name="search"/>
+        </item>
+        <item>
          <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="1">
-           <widget class="QFrame" name="frame_2">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <item>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="0">
-                <widget class="QTreeWidget" name="treeWidget_2">
-                 <column>
-                  <property name="text">
-                   <string notr="true">1</string>
-                  </property>
-                 </column>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QFrame" name="frame">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <item>
-              <layout class="QGridLayout" name="gridLayout_5">
-               <item row="0" column="0">
-                <widget class="QTreeWidget" name="treeWidget">
-                 <column>
-                  <property name="text">
-                   <string notr="true">1</string>
-                  </property>
-                 </column>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </item>
           <item row="1" column="0">
            <widget class="QFrame" name="frame1">
             <property name="frameShape">
@@ -120,27 +73,78 @@
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout">
              <item>
-              <layout class="QGridLayout" name="gridLayout_3">
-               <item row="0" column="1">
-                <widget class="QTreeWidget" name="treeWidget">
-                 <column>
-                  <property name="text">
-                   <string notr="true">id</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>name</string>
-                  </property>
-                 </column>
-                 <column>
-                  <property name="text">
-                   <string>lastname</string>
-                  </property>
-                 </column>
-                </widget>
+              <widget class="QListWidget" name="listWidget">
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
                </item>
-              </layout>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                </property>
+               </item>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -151,7 +155,12 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Pacjenci</string>
+       </attribute>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>Apteki</string>
        </attribute>
       </widget>
      </widget>
