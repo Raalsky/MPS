@@ -1,0 +1,5 @@
+1. Komunikacja HTTP(?) + JSON Klient - serwer
+2. Podłączyć bazę pod Serwer
+3. Przemyśleć zastosowanie OpenSSL w komunikacji
+4. Rozplanować model komunikacji
+5. Zastanowić się nad sensem życia (i ewentualnie systemem kont i logowaniem)
