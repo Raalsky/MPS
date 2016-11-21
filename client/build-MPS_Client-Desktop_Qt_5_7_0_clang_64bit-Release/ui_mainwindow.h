@@ -13,8 +13,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLineEdit>
@@ -22,6 +22,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTabWidget>
+#include <QtWidgets/QTableWidget>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -34,12 +35,14 @@ public:
     QGridLayout *gridLayout;
     QTabWidget *tabWidget;
     QWidget *tab;
-    QVBoxLayout *verticalLayout;
-    QLineEdit *search;
-    QGridLayout *gridLayout_2;
-    QFrame *frame1;
     QHBoxLayout *horizontalLayout;
-    QListWidget *listWidget;
+    QVBoxLayout *verticalLayout_2;
+    QLineEdit *search;
+    QListWidget *searchResults;
+    QGroupBox *groupBox;
+    QHBoxLayout *horizontalLayout_3;
+    QTableWidget *details;
+    QListWidget *listWidget_3;
     QWidget *tab_2;
     QWidget *tab_3;
     QStatusBar *statusBar;
@@ -67,50 +70,92 @@ public:
         tabWidget->setMaximumSize(QSize(13213123, 16777215));
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
-        verticalLayout = new QVBoxLayout(tab);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        search = new QLineEdit(tab);
-        search->setObjectName(QStringLiteral("search"));
-
-        verticalLayout->addWidget(search);
-
-        gridLayout_2 = new QGridLayout();
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        frame1 = new QFrame(tab);
-        frame1->setObjectName(QStringLiteral("frame1"));
-        frame1->setFrameShape(QFrame::StyledPanel);
-        frame1->setFrameShadow(QFrame::Raised);
-        horizontalLayout = new QHBoxLayout(frame1);
+        horizontalLayout = new QHBoxLayout(tab);
         horizontalLayout->setSpacing(6);
         horizontalLayout->setContentsMargins(11, 11, 11, 11);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
-        listWidget = new QListWidget(frame1);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        new QListWidgetItem(listWidget);
-        listWidget->setObjectName(QStringLiteral("listWidget"));
+        verticalLayout_2 = new QVBoxLayout();
+        verticalLayout_2->setSpacing(6);
+        verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
+        search = new QLineEdit(tab);
+        search->setObjectName(QStringLiteral("search"));
 
-        horizontalLayout->addWidget(listWidget);
+        verticalLayout_2->addWidget(search);
+
+        searchResults = new QListWidget(tab);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        new QListWidgetItem(searchResults);
+        searchResults->setObjectName(QStringLiteral("searchResults"));
+
+        verticalLayout_2->addWidget(searchResults);
+
+        groupBox = new QGroupBox(tab);
+        groupBox->setObjectName(QStringLiteral("groupBox"));
+        horizontalLayout_3 = new QHBoxLayout(groupBox);
+        horizontalLayout_3->setSpacing(6);
+        horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
+        horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
+        details = new QTableWidget(groupBox);
+        if (details->columnCount() < 1)
+            details->setColumnCount(1);
+        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+        details->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        if (details->rowCount() < 7)
+            details->setRowCount(7);
+        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(0, __qtablewidgetitem1);
+        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(1, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(2, __qtablewidgetitem3);
+        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(3, __qtablewidgetitem4);
+        QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(4, __qtablewidgetitem5);
+        QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(5, __qtablewidgetitem6);
+        QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
+        details->setVerticalHeaderItem(6, __qtablewidgetitem7);
+        QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
+        details->setItem(0, 0, __qtablewidgetitem8);
+        QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
+        details->setItem(1, 0, __qtablewidgetitem9);
+        QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
+        details->setItem(2, 0, __qtablewidgetitem10);
+        QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
+        details->setItem(3, 0, __qtablewidgetitem11);
+        QTableWidgetItem *__qtablewidgetitem12 = new QTableWidgetItem();
+        details->setItem(4, 0, __qtablewidgetitem12);
+        QTableWidgetItem *__qtablewidgetitem13 = new QTableWidgetItem();
+        details->setItem(5, 0, __qtablewidgetitem13);
+        QTableWidgetItem *__qtablewidgetitem14 = new QTableWidgetItem();
+        details->setItem(6, 0, __qtablewidgetitem14);
+        details->setObjectName(QStringLiteral("details"));
+
+        horizontalLayout_3->addWidget(details);
+
+        listWidget_3 = new QListWidget(groupBox);
+        listWidget_3->setObjectName(QStringLiteral("listWidget_3"));
+
+        horizontalLayout_3->addWidget(listWidget_3);
 
 
-        gridLayout_2->addWidget(frame1, 1, 0, 1, 1);
+        verticalLayout_2->addWidget(groupBox);
 
 
-        verticalLayout->addLayout(gridLayout_2);
+        horizontalLayout->addLayout(verticalLayout_2);
 
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
@@ -140,40 +185,76 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MedicalPrescriptionsSystem Client", 0));
 
-        const bool __sortingEnabled = listWidget->isSortingEnabled();
-        listWidget->setSortingEnabled(false);
-        QListWidgetItem *___qlistwidgetitem = listWidget->item(0);
+        const bool __sortingEnabled = searchResults->isSortingEnabled();
+        searchResults->setSortingEnabled(false);
+        QListWidgetItem *___qlistwidgetitem = searchResults->item(0);
         ___qlistwidgetitem->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem1 = listWidget->item(1);
+        QListWidgetItem *___qlistwidgetitem1 = searchResults->item(1);
         ___qlistwidgetitem1->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem2 = listWidget->item(2);
+        QListWidgetItem *___qlistwidgetitem2 = searchResults->item(2);
         ___qlistwidgetitem2->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem3 = listWidget->item(3);
+        QListWidgetItem *___qlistwidgetitem3 = searchResults->item(3);
         ___qlistwidgetitem3->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem4 = listWidget->item(4);
+        QListWidgetItem *___qlistwidgetitem4 = searchResults->item(4);
         ___qlistwidgetitem4->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem5 = listWidget->item(5);
+        QListWidgetItem *___qlistwidgetitem5 = searchResults->item(5);
         ___qlistwidgetitem5->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem6 = listWidget->item(6);
+        QListWidgetItem *___qlistwidgetitem6 = searchResults->item(6);
         ___qlistwidgetitem6->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem7 = listWidget->item(7);
+        QListWidgetItem *___qlistwidgetitem7 = searchResults->item(7);
         ___qlistwidgetitem7->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem8 = listWidget->item(8);
+        QListWidgetItem *___qlistwidgetitem8 = searchResults->item(8);
         ___qlistwidgetitem8->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem9 = listWidget->item(9);
+        QListWidgetItem *___qlistwidgetitem9 = searchResults->item(9);
         ___qlistwidgetitem9->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem10 = listWidget->item(10);
+        QListWidgetItem *___qlistwidgetitem10 = searchResults->item(10);
         ___qlistwidgetitem10->setText(QApplication::translate("MainWindow", "dr hab. Rafa\305\202 Jankowski Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego w Krakowie", 0));
-        QListWidgetItem *___qlistwidgetitem11 = listWidget->item(11);
+        QListWidgetItem *___qlistwidgetitem11 = searchResults->item(11);
         ___qlistwidgetitem11->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem12 = listWidget->item(12);
+        QListWidgetItem *___qlistwidgetitem12 = searchResults->item(12);
         ___qlistwidgetitem12->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        QListWidgetItem *___qlistwidgetitem13 = listWidget->item(13);
+        QListWidgetItem *___qlistwidgetitem13 = searchResults->item(13);
         ___qlistwidgetitem13->setText(QApplication::translate("MainWindow", "prof. dr. hab. Adrianna Ewa Jasi\305\204ska-Jankowska lekraz weterynarii Wydzia\305\202 Lekarski Collegium Medicum Uniwersytetu Jagiello\305\204skiego", 0));
-        listWidget->setSortingEnabled(__sortingEnabled);
+        searchResults->setSortingEnabled(__sortingEnabled);
 
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Pracownicy", 0));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Pacjenci", 0));
+        groupBox->setTitle(QApplication::translate("MainWindow", "Dane pacjenta", 0));
+        QTableWidgetItem *___qtablewidgetitem = details->horizontalHeaderItem(0);
+        ___qtablewidgetitem->setText(QApplication::translate("MainWindow", "Pacjent", 0));
+        QTableWidgetItem *___qtablewidgetitem1 = details->verticalHeaderItem(0);
+        ___qtablewidgetitem1->setText(QApplication::translate("MainWindow", "Imi\304\231", 0));
+        QTableWidgetItem *___qtablewidgetitem2 = details->verticalHeaderItem(1);
+        ___qtablewidgetitem2->setText(QApplication::translate("MainWindow", "Nazwisko", 0));
+        QTableWidgetItem *___qtablewidgetitem3 = details->verticalHeaderItem(2);
+        ___qtablewidgetitem3->setText(QApplication::translate("MainWindow", "Pesel", 0));
+        QTableWidgetItem *___qtablewidgetitem4 = details->verticalHeaderItem(3);
+        ___qtablewidgetitem4->setText(QApplication::translate("MainWindow", "Data urodzenia", 0));
+        QTableWidgetItem *___qtablewidgetitem5 = details->verticalHeaderItem(4);
+        ___qtablewidgetitem5->setText(QApplication::translate("MainWindow", "Termin ubezpieczenia", 0));
+        QTableWidgetItem *___qtablewidgetitem6 = details->verticalHeaderItem(5);
+        ___qtablewidgetitem6->setText(QApplication::translate("MainWindow", "Ostatnia wizyta", 0));
+        QTableWidgetItem *___qtablewidgetitem7 = details->verticalHeaderItem(6);
+        ___qtablewidgetitem7->setText(QApplication::translate("MainWindow", "Jakies inne dziwne dane", 0));
+
+        const bool __sortingEnabled1 = details->isSortingEnabled();
+        details->setSortingEnabled(false);
+        QTableWidgetItem *___qtablewidgetitem8 = details->item(0, 0);
+        ___qtablewidgetitem8->setText(QApplication::translate("MainWindow", "Rafa\305\202", 0));
+        QTableWidgetItem *___qtablewidgetitem9 = details->item(1, 0);
+        ___qtablewidgetitem9->setText(QApplication::translate("MainWindow", "Jankowski", 0));
+        QTableWidgetItem *___qtablewidgetitem10 = details->item(2, 0);
+        ___qtablewidgetitem10->setText(QApplication::translate("MainWindow", "96042112444", 0));
+        QTableWidgetItem *___qtablewidgetitem11 = details->item(3, 0);
+        ___qtablewidgetitem11->setText(QApplication::translate("MainWindow", "21 Kwietnia 1996", 0));
+        QTableWidgetItem *___qtablewidgetitem12 = details->item(4, 0);
+        ___qtablewidgetitem12->setText(QApplication::translate("MainWindow", "15-04-2020", 0));
+        QTableWidgetItem *___qtablewidgetitem13 = details->item(5, 0);
+        ___qtablewidgetitem13->setText(QApplication::translate("MainWindow", "10-11-2015", 0));
+        QTableWidgetItem *___qtablewidgetitem14 = details->item(6, 0);
+        ___qtablewidgetitem14->setText(QApplication::translate("MainWindow", "Dane", 0));
+        details->setSortingEnabled(__sortingEnabled1);
+
+        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Pacjenci", 0));
+        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Pracownicy", 0));
         tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MainWindow", "Apteki", 0));
     } // retranslateUi
 

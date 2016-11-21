@@ -16,22 +16,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setStyleSheet(StyleSheet);
 
-    //ui->statusBar->showMessage("Offline");
-
-    /*QTreeWidget * tree = ui->treeWidget;
-
-    QTreeWidgetItem * topLevel = new QTreeWidgetItem();
-    topLevel->setText(0, "This is top level");
-
-    for(int i=0; i<5; i++)
-    {
-        QTreeWidgetItem * item = new QTreeWidgetItem();
-        item->setText(0,"item " + QString::number(i+1));
-        topLevel->addChild(item);
-    }
-
-    tree->addTopLevelItem(topLevel);*/
-
     QPixmap img(":/assets/online.png");
     QLabel *label = new QLabel(this);
     label->setPixmap(img);
@@ -42,6 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->statusBar->addWidget(status);
 
     ui->search->setAttribute(Qt::WA_MacShowFocusRect, 0);
+
+    ui->searchResults->setFocusPolicy(Qt::NoFocus);
+
+    QHeaderView* header = ui->details->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::Stretch);
 }
 
 MainWindow::~MainWindow()

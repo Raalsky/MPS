@@ -55,96 +55,175 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Pracownicy</string>
+        <string>Pacjenci</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QLineEdit" name="search"/>
-        </item>
-        <item>
-         <layout class="QGridLayout" name="gridLayout_2">
-          <item row="1" column="0">
-           <widget class="QFrame" name="frame1">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="search"/>
+          </item>
+          <item>
+           <widget class="QListWidget" name="searchResults">
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Dane pacjenta</string>
             </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
              <item>
-              <widget class="QListWidget" name="listWidget">
-               <item>
+              <widget class="QTableWidget" name="details">
+               <row>
                 <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                 <string>Imię</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Nazwisko</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Pesel</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Data urodzenia</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Termin ubezpieczenia</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Ostatnia wizyta</string>
+                </property>
+               </row>
+               <row>
+                <property name="text">
+                 <string>Jakies inne dziwne dane</string>
+                </property>
+               </row>
+               <column>
+                <property name="text">
+                 <string>Pacjent</string>
+                </property>
+               </column>
+               <item row="0" column="0">
+                <property name="text">
+                 <string>Rafał</string>
                 </property>
                </item>
-               <item>
+               <item row="1" column="0">
                 <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                 <string>Jankowski</string>
                 </property>
                </item>
-               <item>
+               <item row="2" column="0">
                 <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                 <string>96042112444</string>
                 </property>
                </item>
-               <item>
+               <item row="3" column="0">
                 <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                 <string>21 Kwietnia 1996</string>
                 </property>
                </item>
-               <item>
+               <item row="4" column="0">
                 <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
+                 <string>15-04-2020</string>
                 </property>
                </item>
-               <item>
+               <item row="5" column="0">
                 <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                 <string>10-11-2015</string>
                 </property>
                </item>
-               <item>
+               <item row="6" column="0">
                 <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>dr hab. Rafał Jankowski Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego w Krakowie</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>prof. dr. hab. Adrianna Ewa Jasińska-Jankowska lekraz weterynarii Wydział Lekarski Collegium Medicum Uniwersytetu Jagiellońskiego</string>
+                 <string>Dane</string>
                 </property>
                </item>
               </widget>
+             </item>
+             <item>
+              <widget class="QListWidget" name="listWidget_3"/>
              </item>
             </layout>
            </widget>
@@ -155,7 +234,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Pacjenci</string>
+        <string>Pracownicy</string>
        </attribute>
       </widget>
       <widget class="QWidget" name="tab_3">
