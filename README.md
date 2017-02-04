@@ -19,7 +19,7 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 ![Database Diagram](diagram.png)
 
 # Kod SQL
-## Tabele
+## Tabele (20)
 ### Tabela Adresses
 ```sql
 CREATE TABLE Adresses
