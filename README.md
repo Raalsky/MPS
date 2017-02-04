@@ -1,13 +1,25 @@
-# MedicalPrescriptionsSystem
+# Medical Prescriptions System
+
+Główną ideą stojącą za **Medical Prescriptions System** było zaprojektowanie i zaimplementowanie systemu służącego do usprawnienia pracy placówek leczniczych i całego procesu leczenia od diagnozy przez wystawienie recepty po uzyskanie leków w możliwie najkrótszym czasie i najniższej cenie. W projekcie można wyróżnić trzy główne składowe. Pierwszą z nich jest obsługa zamówień w hurtownii i kontrola stanu i cen produktów. Podobna funkcjonalność została przygotowana do obsługi aptek i punktów aptecznych. Głównym elementem pozostaje mechanizm obsługi pacjentów, prowadzenia placówek leczniczych, koordynacja lekarzami i wystawianie recept leków.
+
+W trakcie tworzenia bazy korzystaliśmy z ogólnodostępnych **rzeczywistych** danych pobranych z portalu: https://danepubliczne.gov.pl
+Na dane te składają się:
+- Lista leków
+- Kwoty refundacji leków za rok 2016
+- Lista hurtownii produktów medycznych
+- Lista placówek leczniczych
+
+Większość danych została przefiltrowana w celu usunięcia wpisów z niepełnymi danymi i ograniczona głównie do miasta Kraków.
 
 ## Autorzy
-* Łukasz Kowalski
-* Rafał Jankowski
+* Łukasz Kowalski ([@luke9642](https://github.com/luke9642))
+* Rafał Jankowski ([@raalsky](https://github.com/raalsky))
 
 # Diagram
 ![Database Diagram](diagram.png)
 
 # Kod SQL
+## Tabele
 ### Tabela Adresses
 ```sql
 CREATE TABLE Adresses
