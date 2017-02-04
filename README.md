@@ -4,12 +4,11 @@
 * Łukasz Kowalski
 * Rafał Jankowski
 
-#1
-
 # Diagram
 ![Database Diagram](diagram.png)
 
 # Kod SQL
+### Tabela Adresses
 ```sql
 CREATE TABLE Adresses
 (
