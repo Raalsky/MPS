@@ -312,11 +312,6 @@ CREATE TABLE WholesalesProducts
 ## Procedury
 ### Procedura __AddUser
 ```sql
-USE mps;
-GO
-IF OBJECT_ID ( '__AddUser', 'P' ) IS NOT NULL
-    DROP PROCEDURE __AddUser;
-GO
 CREATE PROCEDURE __AddUser
 (
   @Login NVARCHAR(25),
@@ -368,4 +363,261 @@ END
 Przykład:
 ```sql
 __AddUser 'anowak2@','annanowak123','96042108611',2,'Anna','Nowak','1996-03-22','32-330','małopolskie','Kraków','ul.','Marszałkowska','7B','6'
+```
+
+### Procedura AddDoctor
+```sql
+CREATE PROCEDURE AddDoctor(
+  @InstitutionId INT,
+  @Branch NVARCHAR(25),
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [DoctorCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT InstitutionId FROM Institutions WHERE InstitutionId = @InstitutionId)
+      BEGIN
+        RAISERROR('Nie ma takiej instytucji',16,34);
+        ROLLBACK TRANSACTION [DoctorCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Doctors (UserId, InstitutionId, Branch, EmploymentDate) VALUES (@UserId, @InstitutionId, @Branch, GETDATE());
+    COMMIT TRANSACTION [DoctorCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia lekarza',16,1);
+    ROLLBACK TRANSACTION [DoctorCreation];
+  END CATCH
+END
+```
+
+### Procedura AddPatient
+```sql
+CREATE PROCEDURE AddPatient(
+  @PESEL CHAR(11),
+  @PatientName VARCHAR(25),
+  @PatientLastName VARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5),
+  @BloodType NVARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [PatientCreation];
+  BEGIN TRY
+    IF dbo.CheckPESEL(@PESEL) = 0
+      BEGIN
+        RAISERROR ('Zły PESEL', 16,34);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+    ELSE
+    IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+      INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+    INSERT INTO Patients (PESEL, PatientName, PatientLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr, BloodType)
+    VALUES (@PESEL, @PatientName, @PatientLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr, @BloodType);
+    COMMIT TRANSACTION [PatientCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR ('Błąd podczas tworzenia pacjenta', 16,1);
+    ROLLBACK TRANSACTION [PatientCreation];
+  END CATCH
+END
+```
+
+### Procedura AddInstitution
+```sql
+CREATE PROCEDURE AddInstitution
+(
+  @InstitutionName NVARCHAR(50),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [InstitutionCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Institutions (InstitutionName, PostalCode, Prefix, Street, HouseNr)
+          VALUES (@InstitutionName, @PostalCode, @Prefix, @Street, @HouseNr)
+      COMMIT TRANSACTION [InstitutionCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia instytucji', 16,1);
+      ROLLBACK TRANSACTION [InstitutionCreation];
+    END CATCH
+END
+```
+
+### Procedura AddPharmacy
+```sql
+CREATE PROCEDURE AddPharmacy
+(
+  @Name NVARCHAR(50),
+  @Type NVARCHAR(30),
+  @AuthorizationNr VARCHAR(40),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [PharmacyCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Pharmacies (Name, Type, AuthorizationNr, PostalCode, Prefix, Street, HouseNr, FlatNr)
+          VALUES (@Name, @Type, @AuthorizationNr, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
+      COMMIT TRANSACTION [PharmacyCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia apteki', 16,1);
+      ROLLBACK TRANSACTION [PharmacyCreation];
+    END CATCH
+END
+```
+
+### Procedura AddWholesale
+```sql
+CREATE PROCEDURE AddWholesale
+(
+  @WholesaleName NVARCHAR(50),
+  @AuthorizationNr VARCHAR(40),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [WholesaleCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Wholesales (WholesaleName, AuthorizationNr, CreationDate, PostalCode, Prefix, Street, HouseNr)
+          VALUES (@WholesaleName, @AuthorizationNr, GETDATE(), @PostalCode, @Prefix, @Street, @HouseNr)
+      COMMIT TRANSACTION [WholesaleCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia hurtowni', 16,1);
+      ROLLBACK TRANSACTION [WholesaleCreation];
+    END CATCH
+END
+```
+
+### AddPharmacist
+```sql
+CREATE PROCEDURE AddPharmacist(
+  @PharmacyId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [PharmacistCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
+      BEGIN
+        RAISERROR('Nie ma takiej apteki',16,34);
+        ROLLBACK TRANSACTION [PharmacistCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Pharmacists (UserId, PharmacyId, EmploymentDate) VALUES (@UserId, @PharmacyId, GETDATE());
+    COMMIT TRANSACTION [PharmacistCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia farmaceuty',16,1);
+    ROLLBACK TRANSACTION [PharmacistCreation];
+  END CATCH
+END
+```
+
+### Procedura AddSaler
+```sql
+CREATE PROCEDURE AddSaler(
+  @WholesaleId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [SalerCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
+      BEGIN
+        RAISERROR('Nie ma takiej hurtowni',16,34);
+        ROLLBACK TRANSACTION [SalerCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Salers (UserId, WholesaleId, EmploymentDate) VALUES (@UserId, @WholesaleId, GETDATE());
+    COMMIT TRANSACTION [SalerCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia pracownika hurtowni',16,1);
+    ROLLBACK TRANSACTION [SalerCreation];
+  END CATCH
+END
 ```
