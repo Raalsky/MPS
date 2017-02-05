@@ -621,3 +621,165 @@ BEGIN
   END CATCH
 END
 ```
+
+### Procedura GetHistory
+```sql
+CREATE PROCEDURE GetHistory(@PESEL CHAR(11))
+AS
+BEGIN
+  SELECT ET.EventName, MEET.EventBegin, MEET.EventEnd, MEET.Description FROM EventsTypes ET JOIN
+  (SELECT ME.* FROM Patients P JOIN MedicalEvents ME
+    ON P.PESEL = ME.PatientId
+    WHERE P.PESEL = @PESEL) AS MEET
+  ON ET.EventTypeId = MEET.EventType
+END
+```
+
+### Procedura AddOrder
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddOrder', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddOrder;
+GO
+CREATE PROCEDURE AddOrder
+(
+  @WholesaleId INT,
+  @PharmacyId INT,
+  @Items VARCHAR(1000)
+)
+AS
+BEGIN
+  BEGIN TRANSACTION [AddOrder];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
+      RAISERROR('Podana apteka nie istnieje',16,60)
+    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
+      RAISERROR('Podana hurtownia nie istnieje',16,61)
+
+    INSERT INTO Orders (WholesaleId, PharmacyId, OrderDate) VALUES (@WholesaleId, @PharmacyId, GETDATE())
+
+    DECLARE @OrderId INT = SCOPE_IDENTITY()
+
+    DECLARE @individual varchar(50) = null
+    DECLARE @EAN BIGINT
+    DECLARE @Quantity INT
+    DECLARE @products VARCHAR(1000) = @Items
+    DECLARE @UnitPrice FLOAT;
+
+    WHILE LEN(@products) > 0
+    BEGIN
+      IF PATINDEX('%,%', @products) > 0
+      BEGIN
+        SET @individual = SUBSTRING(@products, 0, PATINDEX('%,%', @products))
+        SET @EAN = CONVERT(BIGINT,SUBSTRING(@individual, 0, CHARINDEX('[', @individual)))
+        SET @Quantity = CONVERT(INT,SUBSTRING(@individual, LEN(@EAN) + 2, CHARINDEX(']',@individual) - LEN(@EAN) - 2))
+        ---SELECT @individual, @EAN, @Quantity
+
+        IF NOT EXISTS(SELECT EAN FROM Medicines WHERE EAN = @EAN)
+          RAISERROR('Podany lek nie istnieje',16,62)
+
+        IF NOT EXISTS(SELECT Price FROM WholesalesProducts WHERE MedicineId = @EAN)
+          RAISERROR('Podana hurtownia nie dysponuje aktualnie danym lekiem',16,63)
+
+        SELECT @UnitPrice = Price FROM WholesalesProducts WHERE MedicineId = @EAN
+
+        INSERT INTO OrderDetails (OrderId, MedicineId, UnitPrice, Quantity) VALUES (@OrderId, @EAN, @UnitPrice, @Quantity)
+        SET @products = SUBSTRING(@products, LEN(@individual + ',') + 1, LEN(@products))
+      END
+      ELSE
+      BEGIN
+        SET @individual = @products
+        SET @products = NULL
+        SET @EAN = CONVERT(BIGINT,SUBSTRING(@individual, 0, CHARINDEX('[', @individual)))
+        SET @Quantity = CONVERT(INT,SUBSTRING(@individual, LEN(@EAN) + 2, CHARINDEX(']',@individual) - LEN(@EAN) - 2))
+        ---SELECT @individual, @EAN, @Quantity
+        IF NOT EXISTS(SELECT EAN FROM Medicines WHERE EAN = @EAN)
+          RAISERROR('Podany lek nie istnieje',16,62)
+
+        IF NOT EXISTS(SELECT Price FROM WholesalesProducts WHERE MedicineId = @EAN)
+          RAISERROR('Podana hurtownia nie dysponuje aktualnie danym lekiem',16,63)
+
+        SELECT @UnitPrice = Price FROM WholesalesProducts WHERE MedicineId = @EAN
+
+        INSERT INTO OrderDetails (OrderId, MedicineId, UnitPrice, Quantity) VALUES (@OrderId, @EAN, @UnitPrice, @Quantity)
+      END
+  END
+  COMMIT TRANSACTION [AddOrder];
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+    ROLLBACK TRANSACTION [AddOrder];
+  END CATCH
+END
+```
+Przykład:
+```sql
+AddOrder 2, 92, '5055565711958[4],4037353010604[12],4037353010604[1]'
+```
+
+### Procedura AddWholesaleProduct
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddWholesaleProduct', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddWholesaleProduct;
+GO
+CREATE PROCEDURE AddWholesaleProduct
+(
+  @WholesaleId INT,
+  @MedicineId BIGINT,
+  @Price FLOAT
+)
+AS
+BEGIN
+  BEGIN TRY
+    IF @Price < 0
+      RAISERROR ('Cena nie może być ujemna',16,50)
+    IF NOT EXISTS(SELECT * FROM Wholesales WHERE Id = @WholesaleId)
+      RAISERROR ('Podana hurtownia nie istnieje',16,51)
+    IF NOT EXISTS(SELECT * FROM Medicines WHERE EAN = @MedicineId)
+      RAISERROR ('Podany lek nie istnieje',16,52)
+    IF EXISTS(SELECT * FROM WholesalesProducts WHERE WholesaleId = @WholesaleId AND MedicineId = @MedicineId)
+      UPDATE WholesalesProducts SET Price = @Price WHERE WholesaleId = @WholesaleId AND MedicineId = @MedicineId
+    ELSE
+      INSERT INTO WholesalesProducts (MedicineId, WholesaleId, Price) VALUES (@MedicineId, @WholesaleId, @Price)
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+  END CATCH
+END
+```
+
+### Procedura AddPharmacyProduct
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddPharmacyProduct', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddPharmacyProduct;
+GO
+CREATE PROCEDURE AddPharmacyProduct
+(
+  @PharmacyId INT,
+  @MedicineId BIGINT,
+  @Price FLOAT
+)
+AS
+BEGIN
+  BEGIN TRY
+    IF @Price < 0
+      RAISERROR ('Cena nie może być ujemna',16,50)
+    IF NOT EXISTS(SELECT * FROM Pharmacies WHERE Id = @PharmacyId)
+      RAISERROR ('Podana apteka nie istnieje',16,51)
+    IF NOT EXISTS(SELECT * FROM Medicines WHERE EAN = @MedicineId)
+      RAISERROR ('Podany lek nie istnieje',16,52)
+    IF EXISTS(SELECT * FROM PharmaciesProducts WHERE PharmacyId = @PharmacyId AND MedicineId = @MedicineId)
+      UPDATE PharmaciesProducts SET Price = @Price WHERE PharmacyId = @PharmacyId AND MedicineId = @MedicineId
+    ELSE
+      INSERT INTO PharmaciesProducts (MedicineId, PharmacyId, Price) VALUES (@MedicineId, @PharmacyId, @Price)
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+  END CATCH
+END
+```
