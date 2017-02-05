@@ -308,3 +308,64 @@ CREATE TABLE WholesalesProducts
     CONSTRAINT WholesalesProducts_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id)
 );
 ```
+
+## Procedury
+### Procedura __AddUser
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( '__AddUser', 'P' ) IS NOT NULL
+    DROP PROCEDURE __AddUser;
+GO
+CREATE PROCEDURE __AddUser
+(
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [UserCreation];
+    BEGIN TRY
+      IF dbo.CheckPESEL(@PESEL) = 0
+      BEGIN
+        RAISERROR ('Niepoprawny PESEL', 16,34)
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF dbo.isAlphaNumerical(@Login) = 0
+      BEGIN
+        RAISERROR('Login może zawierać wyłącznie litery i cyfry',16,36);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF EXISTS (SELECT Login FROM Users WHERE Login = @Login)
+      BEGIN
+        RAISERROR('Istnieje już podany login',16,35);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Users (Login, Password, PESEL, GroupNr, UserName, UserLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr)
+          VALUES (@Login, HASHBYTES('md5',@Password), @PESEL, @GroupNr, @UserName, @UserLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
+      COMMIT TRANSACTION [UserCreation];
+    END TRY
+    BEGIN CATCH
+      SELECT ERROR_MESSAGE() AS ErrorMessage;
+      ROLLBACK TRANSACTION [UserCreation];
+    END CATCH
+END
+```
+Przykład:
+```sql
+__AddUser 'anowak2@','annanowak123','96042108611',2,'Anna','Nowak','1996-03-22','32-330','małopolskie','Kraków','ul.','Marszałkowska','7B','6'
+```
