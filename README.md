@@ -308,3 +308,478 @@ CREATE TABLE WholesalesProducts
     CONSTRAINT WholesalesProducts_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id)
 );
 ```
+
+## Procedury
+### Procedura __AddUser
+```sql
+CREATE PROCEDURE __AddUser
+(
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [UserCreation];
+    BEGIN TRY
+      IF dbo.CheckPESEL(@PESEL) = 0
+      BEGIN
+        RAISERROR ('Niepoprawny PESEL', 16,34)
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF dbo.isAlphaNumerical(@Login) = 0
+      BEGIN
+        RAISERROR('Login może zawierać wyłącznie litery i cyfry',16,36);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF EXISTS (SELECT Login FROM Users WHERE Login = @Login)
+      BEGIN
+        RAISERROR('Istnieje już podany login',16,35);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Users (Login, Password, PESEL, GroupNr, UserName, UserLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr)
+          VALUES (@Login, HASHBYTES('md5',@Password), @PESEL, @GroupNr, @UserName, @UserLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
+      COMMIT TRANSACTION [UserCreation];
+    END TRY
+    BEGIN CATCH
+      SELECT ERROR_MESSAGE() AS ErrorMessage;
+      ROLLBACK TRANSACTION [UserCreation];
+    END CATCH
+END
+```
+Przykład:
+```sql
+__AddUser 'anowak2@','annanowak123','96042108611',2,'Anna','Nowak','1996-03-22','32-330','małopolskie','Kraków','ul.','Marszałkowska','7B','6'
+```
+
+### Procedura AddDoctor
+```sql
+CREATE PROCEDURE AddDoctor(
+  @InstitutionId INT,
+  @Branch NVARCHAR(25),
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [DoctorCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT InstitutionId FROM Institutions WHERE InstitutionId = @InstitutionId)
+      BEGIN
+        RAISERROR('Nie ma takiej instytucji',16,34);
+        ROLLBACK TRANSACTION [DoctorCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Doctors (UserId, InstitutionId, Branch, EmploymentDate) VALUES (@UserId, @InstitutionId, @Branch, GETDATE());
+    COMMIT TRANSACTION [DoctorCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia lekarza',16,1);
+    ROLLBACK TRANSACTION [DoctorCreation];
+  END CATCH
+END
+```
+
+### Procedura AddPatient
+```sql
+CREATE PROCEDURE AddPatient(
+  @PESEL CHAR(11),
+  @PatientName VARCHAR(25),
+  @PatientLastName VARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5),
+  @BloodType NVARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [PatientCreation];
+  BEGIN TRY
+    IF dbo.CheckPESEL(@PESEL) = 0
+      BEGIN
+        RAISERROR ('Zły PESEL', 16,34);
+        ROLLBACK TRANSACTION [UserCreation];
+      END
+    ELSE
+    IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+      INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+    INSERT INTO Patients (PESEL, PatientName, PatientLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr, BloodType)
+    VALUES (@PESEL, @PatientName, @PatientLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr, @BloodType);
+    COMMIT TRANSACTION [PatientCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR ('Błąd podczas tworzenia pacjenta', 16,1);
+    ROLLBACK TRANSACTION [PatientCreation];
+  END CATCH
+END
+```
+
+### Procedura AddInstitution
+```sql
+CREATE PROCEDURE AddInstitution
+(
+  @InstitutionName NVARCHAR(50),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [InstitutionCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Institutions (InstitutionName, PostalCode, Prefix, Street, HouseNr)
+          VALUES (@InstitutionName, @PostalCode, @Prefix, @Street, @HouseNr)
+      COMMIT TRANSACTION [InstitutionCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia instytucji', 16,1);
+      ROLLBACK TRANSACTION [InstitutionCreation];
+    END CATCH
+END
+```
+
+### Procedura AddPharmacy
+```sql
+CREATE PROCEDURE AddPharmacy
+(
+  @Name NVARCHAR(50),
+  @Type NVARCHAR(30),
+  @AuthorizationNr VARCHAR(40),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [PharmacyCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Pharmacies (Name, Type, AuthorizationNr, PostalCode, Prefix, Street, HouseNr, FlatNr)
+          VALUES (@Name, @Type, @AuthorizationNr, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
+      COMMIT TRANSACTION [PharmacyCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia apteki', 16,1);
+      ROLLBACK TRANSACTION [PharmacyCreation];
+    END CATCH
+END
+```
+
+### Procedura AddWholesale
+```sql
+CREATE PROCEDURE AddWholesale
+(
+  @WholesaleName NVARCHAR(50),
+  @AuthorizationNr VARCHAR(40),
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5)
+)
+AS
+BEGIN
+    BEGIN TRANSACTION [WholesaleCreation];
+    BEGIN TRY
+      IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
+        INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
+      INSERT INTO Wholesales (WholesaleName, AuthorizationNr, CreationDate, PostalCode, Prefix, Street, HouseNr)
+          VALUES (@WholesaleName, @AuthorizationNr, GETDATE(), @PostalCode, @Prefix, @Street, @HouseNr)
+      COMMIT TRANSACTION [WholesaleCreation];
+    END TRY
+    BEGIN CATCH
+      RAISERROR ('Błąd podczas tworzenia hurtowni', 16,1);
+      ROLLBACK TRANSACTION [WholesaleCreation];
+    END CATCH
+END
+```
+
+### AddPharmacist
+```sql
+CREATE PROCEDURE AddPharmacist(
+  @PharmacyId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [PharmacistCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
+      BEGIN
+        RAISERROR('Nie ma takiej apteki',16,34);
+        ROLLBACK TRANSACTION [PharmacistCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Pharmacists (UserId, PharmacyId, EmploymentDate) VALUES (@UserId, @PharmacyId, GETDATE());
+    COMMIT TRANSACTION [PharmacistCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia farmaceuty',16,1);
+    ROLLBACK TRANSACTION [PharmacistCreation];
+  END CATCH
+END
+```
+
+### Procedura AddSaler
+```sql
+CREATE PROCEDURE AddSaler(
+  @WholesaleId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @GroupNr INT,
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [SalerCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
+      BEGIN
+        RAISERROR('Nie ma takiej hurtowni',16,34);
+        ROLLBACK TRANSACTION [SalerCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Salers (UserId, WholesaleId, EmploymentDate) VALUES (@UserId, @WholesaleId, GETDATE());
+    COMMIT TRANSACTION [SalerCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia pracownika hurtowni',16,1);
+    ROLLBACK TRANSACTION [SalerCreation];
+  END CATCH
+END
+```
+
+### Procedura GetHistory
+```sql
+CREATE PROCEDURE GetHistory(@PESEL CHAR(11))
+AS
+BEGIN
+  SELECT ET.EventName, MEET.EventBegin, MEET.EventEnd, MEET.Description FROM EventsTypes ET JOIN
+  (SELECT ME.* FROM Patients P JOIN MedicalEvents ME
+    ON P.PESEL = ME.PatientId
+    WHERE P.PESEL = @PESEL) AS MEET
+  ON ET.EventTypeId = MEET.EventType
+END
+```
+
+### Procedura AddOrder
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddOrder', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddOrder;
+GO
+CREATE PROCEDURE AddOrder
+(
+  @WholesaleId INT,
+  @PharmacyId INT,
+  @Items VARCHAR(1000)
+)
+AS
+BEGIN
+  BEGIN TRANSACTION [AddOrder];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
+      RAISERROR('Podana apteka nie istnieje',16,60)
+    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
+      RAISERROR('Podana hurtownia nie istnieje',16,61)
+
+    INSERT INTO Orders (WholesaleId, PharmacyId, OrderDate) VALUES (@WholesaleId, @PharmacyId, GETDATE())
+
+    DECLARE @OrderId INT = SCOPE_IDENTITY()
+
+    DECLARE @individual varchar(50) = null
+    DECLARE @EAN BIGINT
+    DECLARE @Quantity INT
+    DECLARE @products VARCHAR(1000) = @Items
+    DECLARE @UnitPrice FLOAT;
+
+    WHILE LEN(@products) > 0
+    BEGIN
+      IF PATINDEX('%,%', @products) > 0
+      BEGIN
+        SET @individual = SUBSTRING(@products, 0, PATINDEX('%,%', @products))
+        SET @EAN = CONVERT(BIGINT,SUBSTRING(@individual, 0, CHARINDEX('[', @individual)))
+        SET @Quantity = CONVERT(INT,SUBSTRING(@individual, LEN(@EAN) + 2, CHARINDEX(']',@individual) - LEN(@EAN) - 2))
+        ---SELECT @individual, @EAN, @Quantity
+
+        IF NOT EXISTS(SELECT EAN FROM Medicines WHERE EAN = @EAN)
+          RAISERROR('Podany lek nie istnieje',16,62)
+
+        IF NOT EXISTS(SELECT Price FROM WholesalesProducts WHERE MedicineId = @EAN)
+          RAISERROR('Podana hurtownia nie dysponuje aktualnie danym lekiem',16,63)
+
+        SELECT @UnitPrice = Price FROM WholesalesProducts WHERE MedicineId = @EAN
+
+        INSERT INTO OrderDetails (OrderId, MedicineId, UnitPrice, Quantity) VALUES (@OrderId, @EAN, @UnitPrice, @Quantity)
+        SET @products = SUBSTRING(@products, LEN(@individual + ',') + 1, LEN(@products))
+      END
+      ELSE
+      BEGIN
+        SET @individual = @products
+        SET @products = NULL
+        SET @EAN = CONVERT(BIGINT,SUBSTRING(@individual, 0, CHARINDEX('[', @individual)))
+        SET @Quantity = CONVERT(INT,SUBSTRING(@individual, LEN(@EAN) + 2, CHARINDEX(']',@individual) - LEN(@EAN) - 2))
+        ---SELECT @individual, @EAN, @Quantity
+        IF NOT EXISTS(SELECT EAN FROM Medicines WHERE EAN = @EAN)
+          RAISERROR('Podany lek nie istnieje',16,62)
+
+        IF NOT EXISTS(SELECT Price FROM WholesalesProducts WHERE MedicineId = @EAN)
+          RAISERROR('Podana hurtownia nie dysponuje aktualnie danym lekiem',16,63)
+
+        SELECT @UnitPrice = Price FROM WholesalesProducts WHERE MedicineId = @EAN
+
+        INSERT INTO OrderDetails (OrderId, MedicineId, UnitPrice, Quantity) VALUES (@OrderId, @EAN, @UnitPrice, @Quantity)
+      END
+  END
+  COMMIT TRANSACTION [AddOrder];
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+    ROLLBACK TRANSACTION [AddOrder];
+  END CATCH
+END
+```
+Przykład:
+```sql
+AddOrder 2, 92, '5055565711958[4],4037353010604[12],4037353010604[1]'
+```
+
+### Procedura AddWholesaleProduct
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddWholesaleProduct', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddWholesaleProduct;
+GO
+CREATE PROCEDURE AddWholesaleProduct
+(
+  @WholesaleId INT,
+  @MedicineId BIGINT,
+  @Price FLOAT
+)
+AS
+BEGIN
+  BEGIN TRY
+    IF @Price < 0
+      RAISERROR ('Cena nie może być ujemna',16,50)
+    IF NOT EXISTS(SELECT * FROM Wholesales WHERE Id = @WholesaleId)
+      RAISERROR ('Podana hurtownia nie istnieje',16,51)
+    IF NOT EXISTS(SELECT * FROM Medicines WHERE EAN = @MedicineId)
+      RAISERROR ('Podany lek nie istnieje',16,52)
+    IF EXISTS(SELECT * FROM WholesalesProducts WHERE WholesaleId = @WholesaleId AND MedicineId = @MedicineId)
+      UPDATE WholesalesProducts SET Price = @Price WHERE WholesaleId = @WholesaleId AND MedicineId = @MedicineId
+    ELSE
+      INSERT INTO WholesalesProducts (MedicineId, WholesaleId, Price) VALUES (@MedicineId, @WholesaleId, @Price)
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+  END CATCH
+END
+```
+
+### Procedura AddPharmacyProduct
+```sql
+USE mps;
+GO
+IF OBJECT_ID ( 'AddPharmacyProduct', 'P' ) IS NOT NULL
+    DROP PROCEDURE AddPharmacyProduct;
+GO
+CREATE PROCEDURE AddPharmacyProduct
+(
+  @PharmacyId INT,
+  @MedicineId BIGINT,
+  @Price FLOAT
+)
+AS
+BEGIN
+  BEGIN TRY
+    IF @Price < 0
+      RAISERROR ('Cena nie może być ujemna',16,50)
+    IF NOT EXISTS(SELECT * FROM Pharmacies WHERE Id = @PharmacyId)
+      RAISERROR ('Podana apteka nie istnieje',16,51)
+    IF NOT EXISTS(SELECT * FROM Medicines WHERE EAN = @MedicineId)
+      RAISERROR ('Podany lek nie istnieje',16,52)
+    IF EXISTS(SELECT * FROM PharmaciesProducts WHERE PharmacyId = @PharmacyId AND MedicineId = @MedicineId)
+      UPDATE PharmaciesProducts SET Price = @Price WHERE PharmacyId = @PharmacyId AND MedicineId = @MedicineId
+    ELSE
+      INSERT INTO PharmaciesProducts (MedicineId, PharmacyId, Price) VALUES (@MedicineId, @PharmacyId, @Price)
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+  END CATCH
+END
+```
