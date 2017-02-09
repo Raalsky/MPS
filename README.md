@@ -692,6 +692,7 @@ Przykład:
 AddWholesale 'Adrianella', 'GIF-N-422/722-1/MSH/06', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9'
 ```
 ### Procedura GetHistory
+Podaje dla użytkownika reprezentowanego przez PESEL dane dotyczące jego historii chorób.
 ```sql
 CREATE PROCEDURE GetHistory(@PESEL CHAR(11))
 AS
@@ -898,6 +899,7 @@ Przykład:
 AddPharmacyProduct 145, 5055565711958, 30.99
 ```
 ### Procedura NearestMedicines
+Procedura pokazuje efekty działania funkcji NearestPharmacy. Pobiera ona identyfikator recepty i na jej podstawie zwraca listę najbliższych aptek dla danego pacjenta w których jest dany lek z recepty. Operacja taka może być użyta po stronie klienta do rozdzielenia recepty na kilka, które mogą zostać zrealizowane w osobnych aptekach jednocześnie podając ich adresy i np. ceny w danych aptekach.
 ```sql
 CREATE PROCEDURE NearestMedicines (@PrescriptionId INT)
 AS
@@ -910,6 +912,7 @@ Przykład:
 NearestMedicines 3
 ```
 ### Procedura AVGProductPriceInAllWholesales
+ Wyświetla dla podanego identyfikatora produktu jego średnią cenę we wszystkich hurtowniach, które posiadają dany lek.
 ```sql
 CREATE PROCEDURE AVGProductPriceInAllWholesales(@Product BIGINT)
 AS
@@ -920,7 +923,9 @@ BEGIN
 END
 ```
 ## Funkcje (6)
+
 ### Funkcja GetAddress
+ Funkcja wykonuje konkatenację danych dotyczących adresu i pobiera dane dotyczące miejscowości na podstawie kodu pocztowego
 ```sql
 CREATE FUNCTION dbo.GetAddress(@PostalCode CHAR(6), @Prefix NVARCHAR(3), @Street NVARCHAR(25), @HouseNr VARCHAR(5), @FlatNr VARCHAR(5))
 RETURNS NVARCHAR(200)
@@ -943,6 +948,7 @@ Przykład:
 SELECT dbo.GetAddress(PostalCode, Prefix, Street, HouseNr, FlatNr) FROM Users;
 ```
 ### Funkcja CheckAllergy
+ Funkcja przyjmuje listę leków (np. z recepty). Zwraca tabelę z lekami, których nie może brać pacjent porównując ją z podaną listą. W argumencie podany jest PESEL pacjenta oraz zdefiniowana tablica o typie __ConflictedMedicines__
 ```sql
 CREATE FUNCTION CheckAllergy (@PESEL CHAR(11), @Medicines ConflictedMedicines READONLY)
 RETURNS @Tab TABLE (Medicines BIGINT)
@@ -955,7 +961,8 @@ BEGIN
   RETURN
 END
 ```
-### Funkcja RefundPercent
+### Funkcja RefundPercent.
+ Funkcja zwraca procent refundacji w stosunku do ceny leku. Argumenty to identyfikator leku (EAN) oraz cena.
 ```sql
 CREATE FUNCTION dbo.RefundPercent(@EAN BIGINT, @Price FLOAT)
 RETURNS FLOAT
@@ -976,6 +983,8 @@ Przykład:
 SELECT TOP 1 dbo.RefundPercent(EAN,100.0) FROM Medicines
 ```
 ### Funkcja isAlphaNumerical
+ Zwraca 1 jeśli dany ciąg składa się wyłącznie z liter i cyfr, 0 jeśli ma jakieś inne znaki.
+Wykorzystywany przy dodawaniu użytkowników zarówno w procedurze AddUser i jako CHECK CONSTRAINT
 ```sql
 CREATE FUNCTION dbo.isAlphaNumerical(@str NVARCHAR(100))
 RETURNS INT
@@ -1026,6 +1035,7 @@ RETURN @OK;
 END
 ```
 ### Funkcja NearestPharmacy
+Funkcja zwraca identyfikator apteki najbliższej do podanego pacjenta zawierającego dany lek. Działanie tej funkcji dobrze pokazuje procedura __NearestMedicines__. Odległość jest sprawdzana kolejno czy dana apteka zawierająca dany lek występuje na ulicy na której mieszka pacjent (w tym samym województwie i mieście), następnie sprawdza całe miasto i ostatecznie szuka w całym województwie. Jeśli lek nie występuje w województwie w którym mieszka dany pacjent funkcja zwraca null. Bardziej metryczne pojmowanie odległości mogłoby być stworzone korzystjąc z baz danych przestrzennych (GIS) lub po stronie klienta np. Google Maps API. Działanie tej funkcji jest głównym powodem dlaczego adresy są rozdzielone na wiele kolumn zawierających ulicę, prefix ulicy itp.
 ```sql
 CREATE FUNCTION dbo.NearestPharmacy(@PatientId CHAR(11), @EAN BIGINT)
 RETURNS INT
@@ -1064,7 +1074,11 @@ Przykład:
 SELECT dbo.NearestPharmacy('75092807732', MedicineId) FROM PharmaciesProducts
 ```
 ## Wyzwalacze (9)
-Celem wszystkich wyzwalaczy w naszym projekcie jest pozbywanie się elementów zależnych od usuwanego. Usuwając zamówienie z tabeli __Orders__  chcemy, aby szczegóły zamówienia w postaci rekordów produktów w tabeli __OrdersDetails__ zostały równocześnie usunięte. Problemem w tym przypadku staje się klucz obcy wiążący te tabele. Rozwiązanie w postaci wykorzystania wyzwalaczy __INSTEAD OF__ nie jest szczególnie eleganckie czego jesteśmy w pełni świadomi. Celem było pokazanie możliwości i większej kontroli całego procesu usuwania. Podobne efekt można osiągnąć poprzez dodanie atrybutu __CASCADE__ na odpowiednich kluczach lub prawdopdobnie istnieją jeszcze powszechniej używane rozwiązania. Pomysł polega na chwilowym wyłączeniu sprawdzania integralności referencyjnej w tych tabelach poprzez wyłączenie sprawdzania wymogów kluczów obcych. Dzięki zamknięciu całości w transakcję nie zajdzie nigdy możliwość w której pozostanie wpis zależny od innych. Opis poszczególnych wyzwalaczy pozwalamy sobie ominąć. Należy jednak wyróżnić dwie grupy. Pierwsza grupa zawiera wyzwalacze na tabelach Orders i Prescriptions. Ich cel jest bardzo podobny i sprowadza się do usunięcia zależnych elementów zamówienia/recepty. Druga grupa wyzwalaczy utworzone zostały na tabelach zawierających dane odnoszące się do tabeli __Adresses__. Celem jest usunięcie nadmiarowości. Przy usuwaniu danego lekarza/pacjęta/farmaceuty/sprzedawcy/placówki medycznej/hurtowni/apteki sprawdzamy czy z ich kodem pocztowym jest powiązany jakiś wpis w pozostałych tabelach. Jeśli nie i jesteśmy jednynym "włascicielem" możemy usunąć wpis z tabeli adresów.
+Celem wszystkich wyzwalaczy w naszym projekcie jest pozbywanie się elementów zależnych od usuwanego. Usuwając zamówienie z tabeli __Orders__  chcemy, aby szczegóły zamówienia w postaci rekordów produktów w tabeli __OrdersDetails__ zostały równocześnie usunięte. Problemem w tym przypadku staje się klucz obcy wiążący te tabele. Rozwiązanie w postaci wykorzystania wyzwalaczy __INSTEAD OF__ nie jest szczególnie eleganckie czego jesteśmy w pełni świadomi. Celem było pokazanie możliwości i większej kontroli całego procesu usuwania. Podobne efekt można osiągnąć poprzez dodanie atrybutu __CASCADE__ na odpowiednich kluczach lub prawdopdobnie istnieją jeszcze powszechniej używane rozwiązania. Pomysł polega na chwilowym wyłączeniu sprawdzania integralności referencyjnej w tych tabelach poprzez wyłączenie sprawdzania wymogów kluczów obcych. Dzięki zamknięciu całości w transakcję nie zajdzie nigdy możliwość w której pozostanie wpis zależny od innych. Opis poszczególnych wyzwalaczy pozwalamy sobie ominąć. Należy jednak wyróżnić dwie grupy.
+
+Pierwsza grupa zawiera wyzwalacze na tabelach Orders i Prescriptions. Ich cel jest bardzo podobny i sprowadza się do usunięcia zależnych elementów zamówienia/recepty.
+
+Druga grupa wyzwalaczy utworzone zostały na tabelach zawierających dane odnoszące się do tabeli __Adresses__. Celem jest usunięcie nadmiarowości. Przy usuwaniu danego lekarza/pacjęta/farmaceuty/sprzedawcy/placówki medycznej/hurtowni/apteki sprawdzamy czy z ich kodem pocztowym jest powiązany jakiś wpis w pozostałych tabelach. Jeśli nie i jesteśmy jednynym "włascicielem" możemy usunąć wpis z tabeli adresów.
 
 ### Wyzwalacz PrescriptionsDelete
 ```sql
