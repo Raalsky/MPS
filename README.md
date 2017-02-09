@@ -22,7 +22,7 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 |Byt|Liczba elementów|
 |:----------:|:-------------:|
 |Tabele|20|
-|[Zdefiniowane typy tablicowe](## Typy tablicowe (2))|2|
+|Zdefiniowane typy tablicowe|2|
 |Widoki|5|
 |Procedury|15|
 |Funkcje|6|
@@ -32,6 +32,7 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 # Kod SQL
 ## Tabele (20)
 ### Tabela Adresses
+Tabela przechowująca dane na temat kodów pocztowych i miejscowości do jakich się odwołują. Kolumna Allocation jest stosowana głównie dla aptek, gdzie określa to przynależność jak np. dzielnica.
 ```sql
 CREATE TABLE Adresses
 (
@@ -42,6 +43,7 @@ CREATE TABLE Adresses
 );
 ```
 ### Tabela Allergies
+Tabela zawierająca listę alergii danego pacjenta. Z braków danych założyliśmy, że dany pacjent może być uczulony na dany lek. Jest to zdecydownanie mocnym skótem. W pełnym systemie tabela __Medicines__ zawierałaby składniki z jakich produkowane są dane leki, a u pacjentów możnabyłoby zdefiniować składniki, które wywołają reakcję alergiczną.
 ```sql
 CREATE TABLE Allergies
 (
@@ -53,6 +55,7 @@ CREATE TABLE Allergies
 );
 ```
 ### Tabela Doctors
+Tabela przechowująca lekarzy. Każdy lekarz ma przypisaną instytucję, dziedzinę działań __Branch__ np. kardiologia, datę zatrudnienia. Przy tworzeniu lekarza tworzone jest konto użytkownika, które w polu GroupId będzie miało wartość 1, którą mają wszyscy lekarze.
 ```sql
 CREATE TABLE Doctors
 (
@@ -65,6 +68,7 @@ CREATE TABLE Doctors
 );
 ```
 ### Tabela DoctorsAndPatrientsRelation
+Tabela przechowuje informacje o lekarzach prowadzących danego pacjenta. Dany pacjent może mieć przypisanych wielu lekarzy.
 ```sql
 CREATE TABLE DoctorsAndPatientsRelation
 (
@@ -76,6 +80,7 @@ CREATE TABLE DoctorsAndPatientsRelation
 );
 ```
 ### Tabela EventsTypes
+Tabela zawiara rodzaje jakie może przyjąc "zdarzenie medyczne" w tabeli __MedicalEvents__. Polega to głównia na trzymaniu identyfikatorów do których przypisany jest typ jak np. "Operacja chirurgiczna", "Pobranie krwi" itp.
 ```sql
 CREATE TABLE EventsTypes
 (
@@ -84,6 +89,7 @@ CREATE TABLE EventsTypes
 );
 ```
 ### Tabela Institutions
+Tabela Institutions jest szerokim zagadnieniem. Może oznaczać na przykład szpital, klinikę, przychodnię itd.
 ```sql
 CREATE TABLE Institutions
 (
@@ -97,6 +103,7 @@ CREATE TABLE Institutions
 );
 ```
 ### Tabela MedicalEvents
+Tabela zawiera "zdarzenia medyczne", które są rozumiane jako każda czynność podjęta w toku leczenia pacjęta. Może to być zarówno postawienie diagnozy jak wykonanie specjalistycznego badania.
 ```sql
 CREATE TABLE MedicalEvents
 (
@@ -111,6 +118,7 @@ CREATE TABLE MedicalEvents
 );
 ```
 ### Tabela Medicines
+Tabela zawierająca listę leków. Powstawa na podstawie danych z https://danepubliczne.gov.pl . EAN jest to ciąg cyfr, który jednoznacznie identyfikuje dany lek. Założeniem jest, że ta tabela nie ulega zmianie w czasie, a przynajmniej robi to bardzo rzadko.
 ```sql
 CREATE TABLE Medicines
 (
@@ -130,20 +138,8 @@ CREATE TABLE Medicines
 );
 CREATE UNIQUE INDEX Medicines_EAN_uindex ON Medicines (EAN);
 ```
-### Tabela OrderDetails
-```sql
-CREATE TABLE OrderDetails
-(
-    OrderId INT NOT NULL,
-    MedicineId BIGINT NOT NULL,
-    UnitPrice INT NOT NULL,
-    Quantity INT NOT NULL,
-    CONSTRAINT PK__OrderDet__D7624946D19FFED2 PRIMARY KEY (OrderId, MedicineId),
-    CONSTRAINT FK__OrderDeta__Order__45BE5BA9 FOREIGN KEY (OrderId) REFERENCES Orders (OrderId),
-    CONSTRAINT OrderDetails_Medicines_EAN_fk FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
-);
-```
 ### Tabela Orders
+Tabela zawierająca spis wszystkich zamówień wykonanych między aptekami i hurtowniami
 ```sql
 CREATE TABLE Orders
 (
@@ -156,7 +152,22 @@ CREATE TABLE Orders
     CONSTRAINT Orders_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
 ```
+### Tabela OrderDetails
+Tabela zawierająca opis każdego zamówienia z tabeli __Orders__
+```sql
+CREATE TABLE OrderDetails
+(
+    OrderId INT NOT NULL,
+    MedicineId BIGINT NOT NULL,
+    UnitPrice INT NOT NULL,
+    Quantity INT NOT NULL,
+    CONSTRAINT PK__OrderDet__D7624946D19FFED2 PRIMARY KEY (OrderId, MedicineId),
+    CONSTRAINT FK__OrderDeta__Order__45BE5BA9 FOREIGN KEY (OrderId) REFERENCES Orders (OrderId),
+    CONSTRAINT OrderDetails_Medicines_EAN_fk FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
+);
+```
 ### Tabela Patients
+Tabela zawierająca listę pacjentów. W odróżnieniu do tabel typu __Doctors__ nie zakładamy kont użytkowników przypisanych do danego pacjenta. Dodatkowo na kolumnie płci został dodany index w celu przyspieszenia operacji typu `select`
 ```sql
 CREATE TABLE Patients
 (
@@ -175,6 +186,7 @@ CREATE TABLE Patients
 );
 ```
 ### Tabela Pharmacies
+Tabela aptek. Podobnie jak tabela __Medicines__ dane zostały pobrane z https://danepubliczne.gov.pl i przefiltrowane jedynie do miasta Kraków.
 ```sql
 CREATE TABLE Pharmacies
 (
@@ -195,6 +207,7 @@ CREATE UNIQUE INDEX Pharmacies_Id_uindex ON Pharmacies (Id);
 CREATE UNIQUE INDEX Pharmacies_AuthorizationNr_uindex ON Pharmacies (AuthorizationNr);
 ```
 ### Tabela PharmaciesProducts
+Tabela przechowująca listę wszystkich leków jakie posiadają dane apteki i ceny jakie im nadały. Zakładamy tutaj, że ceny leków mimo zmian w czasie nie są archiwizowane. W systemie raczej rzadko będzie zachodzić potrzeba sprawdzenia cen w zadanym okresie czasu.
 ```sql
 CREATE TABLE PharmaciesProducts
 (
@@ -207,6 +220,7 @@ CREATE TABLE PharmaciesProducts
 );
 ```
 ### Tabela Pharmacists
+Tabela przechowująca listę farmaceutów. Działa na podobnych zasadach jak __Doctors__. W tabeli __Users__ farmaceuci mają __GroupId__ 2
 ```sql
 CREATE TABLE Pharmacists
 (
@@ -217,7 +231,21 @@ CREATE TABLE Pharmacists
     CONSTRAINT Pharmacists_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
 ```
+### Tabela Prescriptions
+Tabela przechowująca dane na temat wystawionych recept.
+```sql
+CREATE TABLE Prescriptions
+(
+    PrescriptionId INT PRIMARY KEY NOT NULL IDENTITY,
+    PatientId CHAR(11) NOT NULL,
+    PrescriptionDate DATE NOT NULL,
+    DoctorId INT NOT NULL,
+    CONSTRAINT FK__Prescript__Patie__4316F928 FOREIGN KEY (PatientId) REFERENCES Patients (PESEL),
+    CONSTRAINT FK__Prescript__Docto__619B8048 FOREIGN KEY (DoctorId) REFERENCES Doctors (UserId)
+);
+```
 ### Tabela PrescriptionDetails
+Tabela przechowująca listę leków wchodzących w skład danej recepty
 ```sql
 CREATE TABLE PrescriptionDetails
 (
@@ -230,19 +258,8 @@ CREATE TABLE PrescriptionDetails
     CONSTRAINT PrescriptionDetails_Medicines_EAN_fk FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
 );
 ```
-### Tabela Prescriptions
-```sql
-CREATE TABLE Prescriptions
-(
-    PrescriptionId INT PRIMARY KEY NOT NULL IDENTITY,
-    PatientId CHAR(11) NOT NULL,
-    PrescriptionDate DATE NOT NULL,
-    DoctorId INT NOT NULL,
-    CONSTRAINT FK__Prescript__Patie__4316F928 FOREIGN KEY (PatientId) REFERENCES Patients (PESEL),
-    CONSTRAINT FK__Prescript__Docto__619B8048 FOREIGN KEY (DoctorId) REFERENCES Doctors (UserId)
-);
-```
 ### Tabela Salers
+Lista pracowników hurtowni. Działa podobnie jak __Doctors__ i __Pharmaciests__. W __Users__ pracownicy mają __GroupId__ równy 3
 ```sql
 CREATE TABLE Salers
 (
@@ -254,6 +271,7 @@ CREATE TABLE Salers
 );
 ```
 ### Tabela Users
+Tablela zawierająca dane na temat użytkowników w systemie. Nie jest to lista użytkowników, którzy mają możliwość logowania do bazy SQL, ale podwaliny pod aplikację kliencką. W kolumnie Password przechowywane są hasze MD5 haseł podanych przy tworzeniu użytkowników. GroupNr reprezentuje grupę do jakiej przynależy użytkownik. Powinna ona reprezentować prawa jakie są przyznane danej grupie np. dodawanie nowych pacjentów do systemu.
 ```sql
 CREATE TABLE Users
 (
@@ -275,6 +293,7 @@ CREATE TABLE Users
 CREATE UNIQUE INDEX UQ__Users__5E55825B1C8A0ED9 ON Users (Login);
 ```
 ### Tabela Wholesales
+Tabela analogiczna jak __Institutions__ zawierająca spi wszystkich hurtowni w Krakowie. Dane pobrane z https://danepubliczne.gov.pl
 ```sql
 CREATE TABLE Wholesales
 (
@@ -291,6 +310,7 @@ CREATE TABLE Wholesales
 CREATE UNIQUE INDEX Wholesales_Id_uindex ON Wholesales (Id);
 ```
 ### Tabela WholesalesProducts
+Tabela o podobnej funkcjonalości jak tabela __PharmaciesProducts__ zawierająca listę produktów i ich ceny w danej hurtowni. Ceny są tutaj atrybutem, który zmienia się w czasie jednak zakładamy, że nie będa występowały zapytania o archiwalną cenę. Cena ta jest taka sama jak ceny w tabeli __OrdersDetails__ dzięki czemu możliwe są zapytania o cenę archiwalną przedmiotów, które były zakupione w konkretnym momencie przez aptekę.
 ```sql
 CREATE TABLE WholesalesProducts
 (
