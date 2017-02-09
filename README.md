@@ -29,6 +29,22 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 |Wyzwalacze|9|
 |Indeksy|6|
 
+# Opis
+
+## Ograniczenia przyjęte przy projektowaniu
+Projektując bazę danych __MPS__ założyliśmy, że nie nie będzie zapytań o ceny archiwalne w danym okresie czasu. Gdyby założenie byłoby inne należałoby wprowadzić drobne zmiany w projekcie jak np. dodatkowa kolumna w tabelach __WholesalesProducts__ i __PharmaciesProducts__ reprezentująca termin obowiązywania danej ceny.
+
+Zakładamy, że istnieje możliwość zdefiniowania alergii na konkretny lek, a nie na składnik leku. Wymóg ten jest spowodowany brakiem danych na temat składników jakie wchodzą w skład leków w tabeli __Medicines__ pobranej z https://danepubliczne.gov.pl
+
+Odległość między obiektami w bazie rozumiemy jako przynależność do tej samej "jednostki terytorialnej". Kolejno: Ulica < Miasto < Województwo. Jest to duże uproszczenie i całość możnaby rozwinąć korzystając z baz do przechowywania danych geograficznych i korzystając z Google Maps API po stronie klienta.
+
+W projekcie dodatkowo zakładamy, że każda osoba, która osiągnie wiek emerytalny przechodzi automatycznie na emeryturę, co w rzeczywistoście nie zawsze ma miejsce
+
+## Więzy integralności
+Wiele tabel odwołuje się do tabeli __Adresses__. Tabela ta przechowuje informacje o kodach pocztowych i przypisanych im miastach i województwach. Wymogiem dodatkowo narzuconym jest, aby wpisy w tej tabeli istniały wyłącznie jeśli przynajmniej jeden obiekt odnosi się do danego wpisu. Tzn. Po usunięciu ostateniego elementu, którego adres ma dany kod pocztowy to zostaje on automatycznie usunięty przez odpowiedni wyzwalacz
+
+Większość powiązań między tabelami jest zaznaczona na diagramie dołączonym do specyfikacji lub będzie dopowiedzniana w trakcie obrony projektu.
+
 # Kod SQL
 ## Tabele (20)
 ### Tabela Adresses
@@ -103,7 +119,7 @@ CREATE TABLE Institutions
 );
 ```
 ### Tabela MedicalEvents
-Tabela zawiera "zdarzenia medyczne", które są rozumiane jako każda czynność podjęta w toku leczenia pacjęta. Może to być zarówno postawienie diagnozy jak wykonanie specjalistycznego badania.
+Tabela zawiera "zdarzenia medyczne", które są rozumiane jako każda czynność podjęta w toku leczenia pacjenta. Może to być zarówno postawienie diagnozy jak wykonanie specjalistycznego badania.
 ```sql
 CREATE TABLE MedicalEvents
 (
@@ -1045,7 +1061,7 @@ Sprawdza poprawność PESELA na podstawie kryterium cyfry kontrolnej.
 Sprawdza czy dane wyrażenie:
 `9×a1 + 7×a2 + 3×a3 + 1×a4 + 9×a5 + 7×a6 + 3×a7 + 1×a8 + 9×a9 + 7×a10 (mod 10)`
 jest równe a11 (gdzie ai jest to jedna z 11 cyfr należących do PESELA).
-Z funkcji korzysta każda procedura tworząca nowego użytkownika lub dodająca pacjęta.
+Z funkcji korzysta każda procedura tworząca nowego użytkownika lub dodająca pacjenta.
 ```sql
 CREATE FUNCTION CheckPESEL (@PESEL CHAR(11))
 RETURNS INT
@@ -1072,7 +1088,7 @@ RETURN @OK;
 END
 ```
 ### Funkcja NearestPharmacy
-Funkcja zwraca identyfikator apteki najbliższej do podanego pacjenta zawierającego dany lek. Działanie tej funkcji dobrze pokazuje procedura __NearestMedicines__. Odległość jest sprawdzana kolejno czy dana apteka zawierająca dany lek występuje na ulicy na której mieszka pacjent (w tym samym województwie i mieście), następnie sprawdza całe miasto i ostatecznie szuka w całym województwie. Jeśli lek nie występuje w województwie w którym mieszka dany pacjent funkcja zwraca null. Bardziej metryczne pojmowanie odległości mogłoby być stworzone korzystjąc z baz danych przestrzennych (GIS) lub po stronie klienta np. Google Maps API. Działanie tej funkcji jest głównym powodem dlaczego adresy są rozdzielone na wiele kolumn zawierających ulicę, prefix ulicy itp.
+Funkcja zwraca identyfikator apteki najbliższej do podanego pacjenta zawierającego dany lek. Działanie tej funkcji dobrze pokazuje procedura __NearestMedicines__. Odległość jest sprawdzana kolejno czy dana apteka zawierająca dany lek występuje na ulicy na której mieszka pacjent (w tym samym województwie i mieście), następnie sprawdza całe miasto i ostatecznie szuka w całym województwie. Jeśli lek nie występuje w województwie w którym mieszka dany pacjent funkcja zwraca null. Bardziej metryczne pojmowanie odległości mogłoby być stworzone korzystając z baz danych przestrzennych (GIS) lub po stronie klienta np. Google Maps API. Działanie tej funkcji jest głównym powodem dlaczego adresy są rozdzielone na wiele kolumn zawierających ulicę, prefix ulicy itp.
 ```sql
 CREATE FUNCTION dbo.NearestPharmacy(@PatientId CHAR(11), @EAN BIGINT)
 RETURNS INT
@@ -1115,7 +1131,7 @@ Celem wszystkich wyzwalaczy w naszym projekcie jest pozbywanie się elementów z
 
 Pierwsza grupa zawiera wyzwalacze na tabelach Orders i Prescriptions. Ich cel jest bardzo podobny i sprowadza się do usunięcia zależnych elementów zamówienia/recepty.
 
-Druga grupa wyzwalaczy utworzone zostały na tabelach zawierających dane odnoszące się do tabeli __Adresses__. Celem jest usunięcie nadmiarowości. Przy usuwaniu danego lekarza/pacjęta/farmaceuty/sprzedawcy/placówki medycznej/hurtowni/apteki sprawdzamy czy z ich kodem pocztowym jest powiązany jakiś wpis w pozostałych tabelach. Jeśli nie i jesteśmy jednynym "włascicielem" możemy usunąć wpis z tabeli adresów.
+Druga grupa wyzwalaczy utworzone zostały na tabelach zawierających dane odnoszące się do tabeli __Adresses__. Celem jest usunięcie nadmiarowości. Przy usuwaniu danego lekarza/pacjenta/farmaceuty/sprzedawcy/placówki medycznej/hurtowni/apteki sprawdzamy czy z ich kodem pocztowym jest powiązany jakiś wpis w pozostałych tabelach. Jeśli nie i jesteśmy jednynym "właścicielem" możemy usunąć wpis z tabeli adresów.
 
 ### Wyzwalacz PrescriptionsDelete
 ```sql
