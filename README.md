@@ -30,7 +30,6 @@ CREATE TABLE Adresses
     Allocation NVARCHAR(50)
 );
 ```
-
 ### Tabela Allergies
 ```sql
 CREATE TABLE Allergies
@@ -42,7 +41,6 @@ CREATE TABLE Allergies
     CONSTRAINT FK__Allergies__Medic__7B264821 FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
 );
 ```
-
 ### Tabela Doctors
 ```sql
 CREATE TABLE Doctors
@@ -55,7 +53,6 @@ CREATE TABLE Doctors
     CONSTRAINT FK__Doctors__Institu__7755B73D FOREIGN KEY (InstitutionId) REFERENCES Institutions (InstitutionId)
 );
 ```
-
 ### Tabela DoctorsAndPatrientsRelation
 ```sql
 CREATE TABLE DoctorsAndPatientsRelation
@@ -67,7 +64,6 @@ CREATE TABLE DoctorsAndPatientsRelation
     CONSTRAINT FK__DoctorsAn__Patie__756D6ECB FOREIGN KEY (PatientId) REFERENCES Patients (PESEL)
 );
 ```
-
 ### Tabela EventsTypes
 ```sql
 CREATE TABLE EventsTypes
@@ -76,7 +72,6 @@ CREATE TABLE EventsTypes
     EventName NVARCHAR(50)
 );
 ```
-
 ### Tabela Institutions
 ```sql
 CREATE TABLE Institutions
@@ -90,7 +85,6 @@ CREATE TABLE Institutions
     CONSTRAINT Institutions_Adresses_PostalCode_fk FOREIGN KEY (PostalCode) REFERENCES Adresses (PostalCode)
 );
 ```
-
 ### Tabela MedicalEvents
 ```sql
 CREATE TABLE MedicalEvents
@@ -105,7 +99,6 @@ CREATE TABLE MedicalEvents
     CONSTRAINT FK__MedicalHi__Event__3D5E1FD2 FOREIGN KEY (EventType) REFERENCES EventsTypes (EventTypeId)
 );
 ```
-
 ### Tabela Medicines
 ```sql
 CREATE TABLE Medicines
@@ -126,7 +119,6 @@ CREATE TABLE Medicines
 );
 CREATE UNIQUE INDEX Medicines_EAN_uindex ON Medicines (EAN);
 ```
-
 ### Tabela OrderDetails
 ```sql
 CREATE TABLE OrderDetails
@@ -140,7 +132,6 @@ CREATE TABLE OrderDetails
     CONSTRAINT OrderDetails_Medicines_EAN_fk FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
 );
 ```
-
 ### Tabela Orders
 ```sql
 CREATE TABLE Orders
@@ -154,7 +145,6 @@ CREATE TABLE Orders
     CONSTRAINT Orders_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
 ```
-
 ### Tabela Patients
 ```sql
 CREATE TABLE Patients
@@ -173,7 +163,6 @@ CREATE TABLE Patients
     CONSTRAINT Patients_Adresses_PostalCode_fk FOREIGN KEY (PostalCode) REFERENCES Adresses (PostalCode)
 );
 ```
-
 ### Tabela Pharmacies
 ```sql
 CREATE TABLE Pharmacies
@@ -194,7 +183,6 @@ CREATE TABLE Pharmacies
 CREATE UNIQUE INDEX Pharmacies_Id_uindex ON Pharmacies (Id);
 CREATE UNIQUE INDEX Pharmacies_AuthorizationNr_uindex ON Pharmacies (AuthorizationNr);
 ```
-
 ### Tabela PharmaciesProducts
 ```sql
 CREATE TABLE PharmaciesProducts
@@ -207,7 +195,6 @@ CREATE TABLE PharmaciesProducts
     CONSTRAINT PharmaciesProducts_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
 ```
-
 ### Tabela Pharmacists
 ```sql
 CREATE TABLE Pharmacists
@@ -219,7 +206,6 @@ CREATE TABLE Pharmacists
     CONSTRAINT Pharmacists_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
 ```
-
 ### Tabela PrescriptionDetails
 ```sql
 CREATE TABLE PrescriptionDetails
@@ -233,7 +219,6 @@ CREATE TABLE PrescriptionDetails
     CONSTRAINT PrescriptionDetails_Medicines_EAN_fk FOREIGN KEY (MedicineId) REFERENCES Medicines (EAN)
 );
 ```
-
 ### Tabela Prescriptions
 ```sql
 CREATE TABLE Prescriptions
@@ -246,7 +231,6 @@ CREATE TABLE Prescriptions
     CONSTRAINT FK__Prescript__Docto__619B8048 FOREIGN KEY (DoctorId) REFERENCES Doctors (UserId)
 );
 ```
-
 ### Tabela Salers
 ```sql
 CREATE TABLE Salers
@@ -258,7 +242,6 @@ CREATE TABLE Salers
     CONSTRAINT Salers_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id)
 );
 ```
-
 ### Tabela Users
 ```sql
 CREATE TABLE Users
@@ -280,7 +263,6 @@ CREATE TABLE Users
 );
 CREATE UNIQUE INDEX UQ__Users__5E55825B1C8A0ED9 ON Users (Login);
 ```
-
 ### Tabela Wholesales
 ```sql
 CREATE TABLE Wholesales
@@ -297,7 +279,6 @@ CREATE TABLE Wholesales
 );
 CREATE UNIQUE INDEX Wholesales_Id_uindex ON Wholesales (Id);
 ```
-
 ### Tabela WholesalesProducts
 ```sql
 CREATE TABLE WholesalesProducts
@@ -310,7 +291,18 @@ CREATE TABLE WholesalesProducts
     CONSTRAINT WholesalesProducts_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id)
 );
 ```
-## Widoki
+## Dodatkowe przykładowe zdefiniowane wymagania tabel
+```sql
+ALTER TABLE Users
+ADD CHECK (Birth BETWEEN '1900-01-01' AND GETDATE())
+
+ALTER TABLE Patients
+ADD CHECK (Gender IN ('M','K'))
+
+ALTER TABLE Users
+ADD CHECK (dbo.isAlphaNumerical(HouseNr) != 0)
+```
+## Widoki (5)
 ### Widok podający użytkowników z więcej niż jedną rolą
 ```sql
 CREATE VIEW UsersWithMoreThanOneRole
@@ -334,7 +326,6 @@ OR (Gender = 'K' AND
 OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) > 0)
 OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) = 0 AND DATEPART(DD, GETDATE()) - DATEPART(DD, Birth) > 0)))
 ```
-
 ### Widok leków powyżej 50% refundacji
 ```sql
 CREATE VIEW MedicinesRefundsMoreThanHalf
@@ -346,7 +337,6 @@ AS
     ON Pharmacies.Id = PharmaciesProducts.PharmacyId
   WHERE dbo.RefundPercent(MedicineId, Price) >= 50
 ```
-
 ### Widok liczby aptek w każdym mieście
 ```sql
 CREATE VIEW PharmaciesAmountGroupedByCity
@@ -362,8 +352,21 @@ CREATE VIEW NumberOfMedicinesInPharmacies
 AS
 SELECT Pharmacies.Id, (SELECT COUNT(*) FROM PharmaciesProducts WHERE PharmaciesProducts.PharmacyId = Pharmacies.Id) NumberOfMedicines FROM Pharmacies
 ```
-
-## Procedury
+## Typy tablicowe (2)
+### Typ PrescriptionMedicines
+```sql
+CREATE TYPE PrescriptionMedicines AS TABLE
+(
+  EAN BIGINT,
+  Quantity INT,
+  Description TEXT
+)
+```
+### Typ ConflictedMedicines
+```sql
+CREATE TYPE ConflictedMedicines AS TABLE ( EAN BIGINT );
+```
+## Procedury (15)
 ### Procedura __AddUser
 ```sql
 CREATE PROCEDURE __AddUser
@@ -418,7 +421,6 @@ Przykład:
 ```sql
 __AddUser 'anowak2@','annanowak123','96042108611',2,'Anna','Nowak','1996-03-22','32-330','małopolskie','Kraków','ul.','Marszałkowska','7B','6'
 ```
-
 ### Procedura AddDoctor
 ```sql
 CREATE PROCEDURE AddDoctor(
@@ -460,7 +462,6 @@ BEGIN
   END CATCH
 END
 ```
-
 ### Procedura AddPatient
 ```sql
 CREATE PROCEDURE AddPatient(
@@ -500,7 +501,6 @@ BEGIN
   END CATCH
 END
 ```
-
 ### Procedura AddInstitution
 ```sql
 CREATE PROCEDURE AddInstitution
@@ -529,7 +529,6 @@ BEGIN
     END CATCH
 END
 ```
-
 ### Procedura AddPharmacy
 ```sql
 CREATE PROCEDURE AddPharmacy
@@ -568,7 +567,6 @@ Przykład:
 ```sql
 AddPharmacy 'Dr. Max', 'apteka ogólnodostępna', 'FA.KR.4102-8240-Z-242-51/2016/130/09', '2016-01-02', '2016-03-25', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9', '2'
 ```
-
 ### Procedura AddWholesale
 ```sql
 CREATE PROCEDURE AddWholesale
@@ -602,8 +600,7 @@ Przykład:
 ```sql
 AddWholesale 'Adrianella', 'GIF-N-422/722-1/MSH/06', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9'
 ```
-
-### AddPharmacist
+### Procedura AddPharmacist
 ```sql
 CREATE PROCEDURE AddPharmacist(
   @PharmacyId INT,
@@ -643,7 +640,6 @@ BEGIN
   END CATCH
 END
 ```
-
 ### Procedura AddSaler
 ```sql
 CREATE PROCEDURE AddSaler(
@@ -684,7 +680,6 @@ BEGIN
   END CATCH
 END
 ```
-
 ### Procedura GetHistory
 ```sql
 CREATE PROCEDURE GetHistory(@PESEL CHAR(11))
@@ -701,7 +696,6 @@ Przykład:
 ```sql
 GetHistory '75092807732'
 ```
-
 ### Procedura AddOrder
 ```sql
 CREATE PROCEDURE AddOrder
@@ -779,16 +773,8 @@ Przykład:
 ```sql
 AddOrder 2, 92, '5055565711958[4],4037353010604[12],4037353010604[1]'
 ```
-
 ### Procedura AddPrescription
 ```sql
-CREATE TYPE PrescriptionMedicines AS TABLE
-(
-  EAN BIGINT,
-  Quantity INT,
-  Description TEXT
-)
-
 CREATE PROCEDURE AddPrescription
 (
   @PatientId CHAR(11),
@@ -838,7 +824,6 @@ SELECT * FROM Prescriptions
 SELECT * FROM PrescriptionDetails
 SELECT * FROM PharmaciesProducts
 ```
-
 ### Procedura AddWholesaleProduct
 ```sql
 CREATE PROCEDURE AddWholesaleProduct
@@ -870,7 +855,6 @@ Przykład:
 ```sql
 AddWholesaleProduct 4, 5055565711957, 28.99
 ```
-
 ### Procedura AddPharmacyProduct
 ```sql
 CREATE PROCEDURE AddPharmacyProduct
@@ -902,7 +886,6 @@ Przykład:
 ```sql
 AddPharmacyProduct 145, 5055565711958, 30.99
 ```
-
 ### Procedura NearestMedicines
 ```sql
 CREATE PROCEDURE NearestMedicines (@PrescriptionId INT)
@@ -915,7 +898,6 @@ Przykład:
 ```sql
 NearestMedicines 3
 ```
-
 ### Procedura AVGProductPriceInAllWholesales
 ```sql
 CREATE PROCEDURE AVGProductPriceInAllWholesales(@Product BIGINT)
@@ -926,8 +908,7 @@ BEGIN
   WHERE M.EAN = @Product
 END
 ```
-
-## Funkcje
+## Funkcje (6)
 ### Funkcja GetAddress
 ```sql
 CREATE FUNCTION dbo.GetAddress(@PostalCode CHAR(6), @Prefix NVARCHAR(3), @Street NVARCHAR(25), @HouseNr VARCHAR(5), @FlatNr VARCHAR(5))
@@ -950,7 +931,6 @@ Przykład:
 ```sql
 SELECT dbo.GetAddress(PostalCode, Prefix, Street, HouseNr, FlatNr) FROM Users;
 ```
-
 ### Funkcja CheckAllergy
 ```sql
 CREATE FUNCTION CheckAllergy (@PESEL CHAR(11), @Medicines ConflictedMedicines READONLY)
@@ -964,7 +944,6 @@ BEGIN
   RETURN
 END
 ```
-
 ### Funkcja RefundPercent
 ```sql
 CREATE FUNCTION dbo.RefundPercent(@EAN BIGINT, @Price FLOAT)
@@ -985,7 +964,6 @@ Przykład:
 ```sql
 SELECT TOP 1 dbo.RefundPercent(EAN,100.0) FROM Medicines
 ```
-
 ### Funkcja isAlphaNumerical
 ```sql
 CREATE FUNCTION dbo.isAlphaNumerical(@str NVARCHAR(100))
@@ -1005,7 +983,6 @@ Przykład:
 ```sql
 SELECT dbo.isAlphaNumerical(Login) FROM Users
 ```
-
 ### Funkcja CheckPESEL
 ```sql
 CREATE FUNCTION CheckPESEL (@PESEL CHAR(11))
@@ -1032,7 +1009,6 @@ BEGIN
 RETURN @OK;
 END
 ```
-
 ### Funkcja NearestPharmacy
 ```sql
 CREATE FUNCTION dbo.NearestPharmacy(@PatientId CHAR(11), @EAN BIGINT)
@@ -1070,4 +1046,302 @@ END
 Przykład:
 ```sql
 SELECT dbo.NearestPharmacy('75092807732', MedicineId) FROM PharmaciesProducts
+```
+## Wyzwalacze (9)
+### Wyzwalacz PrescriptionsDelete
+```sql
+CREATE TRIGGER PrescriptionsDelete ON Prescriptions INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [PrescriptionsDelete]
+    BEGIN TRY
+      ALTER TABLE Prescriptions NOCHECK CONSTRAINT FK__Prescript__Patie__4316F928
+      ALTER TABLE Prescriptions NOCHECK CONSTRAINT FK__Prescript__Docto__619B8048
+
+      DECLARE @PrescriptionId INT = (SELECT PrescriptionId FROM DELETED)
+
+      DELETE FROM PrescriptionDetails WHERE PrescriptionId = @PrescriptionId
+
+      DELETE FROM Prescriptions WHERE PrescriptionId = @PrescriptionId
+
+      ALTER TABLE Prescriptions CHECK CONSTRAINT FK__Prescript__Docto__619B8048
+      ALTER TABLE Prescriptions CHECK CONSTRAINT FK__Prescript__Patie__4316F928
+
+      COMMIT TRANSACTION [PrescriptionsDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [PrescriptionsDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz OrdersDelete
+```sql
+CREATE TRIGGER OrdersDelete ON Orders INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [OrdersDelete]
+    BEGIN TRY
+      ALTER TABLE Orders NOCHECK CONSTRAINT Orders_Pharmacies_Id_fk
+      ALTER TABLE Orders NOCHECK CONSTRAINT Orders_Wholesales_Id_fk
+
+      DECLARE @OrderId INT = (SELECT OrderId FROM DELETED)
+
+      DELETE FROM OrdersDetails WHERE OrderId = @OrderId
+
+      DELETE FROM Orders WHERE OrderId = @OrderId
+
+      ALTER TABLE Orders CHECK CONSTRAINT Orders_Wholesales_Id_fk
+      ALTER TABLE Orders CHECK CONSTRAINT Orders_Pharmacies_Id_fk
+
+      COMMIT TRANSACTION [OrdersDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [OrdersDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz WholesalesDelete
+```sql
+CREATE TRIGGER WholesalesDelete ON Wholesales INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [WholesalesDelete]
+    BEGIN TRY
+      ALTER TABLE Wholesales NOCHECK CONSTRAINT Wholesales_Adresses_PostalCode_fk
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @WholesaleId INT = (SELECT Id FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM DELETED)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC AND Id != @WholesaleId)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+              BEGIN IF NOT EXISTS(SELECT PostalCode FROM Institutions WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+              END
+          END
+        END
+      END
+      DELETE FROM Wholesales WHERE Id = @WholesaleId
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Wholesales CHECK CONSTRAINT PWholesales_Adresses_PostalCode_fk
+
+      COMMIT TRANSACTION [WholesalesDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [WholesalesDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz PharmaciesDelete
+```sql
+CREATE TRIGGER PharmaciesDelete ON Pharmacies INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [PharmaciesDelete]
+    BEGIN TRY
+      ALTER TABLE Pharmacies NOCHECK CONSTRAINT Pharmacies_Adresses_PostalCode_fk
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @PharmacyId INT = (SELECT Id FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM DELETED)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC AND Id != @PharmacyId)
+              BEGIN IF NOT EXISTS(SELECT PostalCode FROM Institutions WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+              END
+          END
+        END
+      END
+      DELETE FROM Pharmacies WHERE Id = @PharmacyId
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Pharmacies CHECK CONSTRAINT Pharmacies_Adresses_PostalCode_fk
+
+      COMMIT TRANSACTION [PharmaciesDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [PharmaciesDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz InstitutionsDelete
+```sql
+CREATE TRIGGER InstitutionsDelete ON Institutions INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [InstitutionsDelete]
+    BEGIN TRY
+      ALTER TABLE Institutions NOCHECK CONSTRAINT Institutions_Adresses_PostalCode_fk
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @InstitutionId INT = (SELECT InstitutionId FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM DELETED)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+              BEGIN IF NOT EXISTS(SELECT PostalCode FROM Institutions WHERE PostalCode = @PC AND InstitutionId != @InstitutionId)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+              END
+          END
+        END
+      END
+      DELETE FROM Institutions WHERE InstitutionId = @InstitutionId
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Institutions CHECK CONSTRAINT Institutions_Adresses_PostalCode_fk
+
+      COMMIT TRANSACTION [InstitutionsDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [InstitutionsDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz PharmacistsDelete
+```sql
+CREATE TRIGGER PharmacistsDelete ON Pharmacists INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [PharmacistsDelete]
+    BEGIN TRY
+      ALTER TABLE Pharmacists NOCHECK CONSTRAINT FK__Pharmacis__UserI__671F4F74
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @UserId INT = (SELECT UserId FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM Users WHERE UserId = @UserId)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC AND UserId != @UserId)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+            END
+          END
+      END
+      DELETE FROM Users WHERE UserId = @UserId
+      DELETE FROM Pharmacists WHERE UserId IN (SELECT UserId FROM DELETED)
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Pharmacists CHECK CONSTRAINT FK__Pharmacis__UserI__671F4F74
+
+      COMMIT TRANSACTION [PharmacistsDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [PharmacistsDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz SalersDelete
+```sql
+CREATE TRIGGER SalersDelete ON Salers INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [SalersDelete]
+    BEGIN TRY
+      ALTER TABLE Salers NOCHECK CONSTRAINT FK__Salers__UserId__634EBE90
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @UserId INT = (SELECT UserId FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM Users WHERE UserId = @UserId)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC AND UserId != @UserId)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+            END
+          END
+      END
+      DELETE FROM Users WHERE UserId = @UserId
+      DELETE FROM Salers WHERE UserId IN (SELECT UserId FROM DELETED)
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Salers CHECK CONSTRAINT FK__Salers__UserId__634EBE90
+
+      COMMIT TRANSACTION [SalersDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [SalersDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz DoctorsDelete
+```sql
+CREATE TRIGGER DoctorsDelete ON Doctors INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [DoctorsDelete]
+    BEGIN TRY
+      ALTER TABLE Doctors NOCHECK CONSTRAINT FK__Doctors__UserId__5CA1C101
+      ALTER TABLE Users NOCHECK CONSTRAINT Users_Adresses_PostalCode_fk
+
+      DECLARE @UserId INT = (SELECT UserId FROM DELETED)
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM Users WHERE UserId = @UserId)
+
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC AND UserId != @UserId)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode = @PC
+            END
+          END
+      END
+      DELETE FROM Users WHERE UserId = @UserId
+      DELETE FROM Doctors WHERE UserId IN (SELECT UserId FROM DELETED)
+
+      ALTER TABLE Users CHECK CONSTRAINT Users_Adresses_PostalCode_fk
+      ALTER TABLE Doctors CHECK CONSTRAINT FK__Doctors__UserId__5CA1C101
+
+      COMMIT TRANSACTION [DoctorsDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [DoctorsDelete]
+    END CATCH
+  END
+```
+### Wyzwalacz PatientDelete
+```sql
+CREATE TRIGGER PatientDelete ON Patients INSTEAD OF DELETE
+  AS
+  BEGIN
+    BEGIN TRANSACTION [PatientDelete]
+    BEGIN TRY
+      ALTER TABLE Patients NOCHECK CONSTRAINT Patients_Adresses_PostalCode_fk
+
+      DECLARE @PC CHAR(6) = (SELECT PostalCode FROM DELETED)
+      DECLARE @PatientId CHAR(11) = (SELECT PESEL FROM DELETED)
+      IF NOT EXISTS(SELECT PostalCode FROM Users WHERE PostalCode = @PC)
+        BEGIN IF NOT EXISTS(SELECT PostalCode FROM Patients WHERE PostalCode = @PC AND PESEL != @PatientId)
+          BEGIN IF NOT EXISTS(SELECT PostalCode FROM Wholesales WHERE PostalCode = @PC)
+            BEGIN IF NOT EXISTS(SELECT PostalCode FROM Pharmacies WHERE PostalCode = @PC)
+                DELETE FROM Adresses WHERE PostalCode IN (SELECT PostalCode FROM DELETED)
+            END
+          END
+      END
+      DELETE FROM Patients WHERE PESEL IN (SELECT PESEL FROM DELETED)
+
+    ALTER TABLE Patients CHECK CONSTRAINT Patients_Adresses_PostalCode_fk
+      COMMIT TRANSACTION [PatientDelete]
+    END TRY
+    BEGIN CATCH
+      ROLLBACK TRANSACTION [PatientDelete]
+    END CATCH
+  END
+```
+## Indeksy
+```sql
+CREATE NONCLUSTERED INDEX PATIENTS_GENDER_INDEX ON Patients (Gender)
+CREATE UNIQUE INDEX Medicines_EAN_uindex ON Medicines (EAN);
+CREATE UNIQUE INDEX Pharmacies_Id_uindex ON Pharmacies (Id);
+CREATE UNIQUE INDEX Pharmacies_AuthorizationNr_uindex ON Pharmacies (AuthorizationNr);
+CREATE UNIQUE INDEX Wholesales_Id_uindex ON Wholesales (Id);
+CREATE UNIQUE INDEX UQ__Users__5E55825B1C8A0ED9 ON Users (Login);
 ```
