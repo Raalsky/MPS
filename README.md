@@ -18,6 +18,17 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 # Diagram
 ![Database Diagram](diagram.png)
 
+# Podsumowanie
+|Byt|Liczba elementów|
+|:----------:|:-------------:|
+|Tabele|20|
+|Zdefiniowane typy tablicowe|2|
+|Widoki|5|
+|Procedury|15|
+|Funkcje|6|
+|Wyzwalacze|9|
+|Indeksy|6|
+
 # Kod SQL
 ## Tabele (20)
 ### Tabela Adresses
@@ -1336,7 +1347,7 @@ CREATE TRIGGER PatientDelete ON Patients INSTEAD OF DELETE
     END CATCH
   END
 ```
-## Indeksy
+## Indeksy (6)
 ```sql
 CREATE NONCLUSTERED INDEX PATIENTS_GENDER_INDEX ON Patients (Gender)
 CREATE UNIQUE INDEX Medicines_EAN_uindex ON Medicines (EAN);
