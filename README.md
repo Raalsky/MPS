@@ -32,18 +32,18 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 # Opis
 
 ## Ograniczenia przyjęte przy projektowaniu
-Projektując bazę danych __MPS__ założyliśmy, że nie nie będzie zapytań o ceny archiwalne w danym okresie czasu. Gdyby założenie byłoby inne należałoby wprowadzić drobne zmiany w projekcie jak np. dodatkowa kolumna w tabelach __WholesalesProducts__ i __PharmaciesProducts__ reprezentująca termin obowiązywania danej ceny.
+Projektując bazę danych __MPS__ założyliśmy, że nie będzie zapytań o ceny archiwalne w danym okresie czasu. Gdyby założenie byłoby inne należałoby wprowadzić drobne zmiany w projekcie jak np. dodatkowa kolumna w tabelach __WholesalesProducts__ i __PharmaciesProducts__ reprezentująca termin obowiązywania danej ceny.
 
-Zakładamy, że istnieje możliwość zdefiniowania alergii na konkretny lek, a nie na składnik leku. Wymóg ten jest spowodowany brakiem danych na temat składników jakie wchodzą w skład leków w tabeli __Medicines__ pobranej z https://danepubliczne.gov.pl
+Zakładamy, że istnieje możliwość zdefiniowania alergii na konkretny lek, a nie na składnik leku. Wymóg ten jest spowodowany brakiem danych na temat składników jakie wchodzą w skład leków w tabeli __Medicines__ pobranej z https://danepubliczne.gov.pl .
 
 Odległość między obiektami w bazie rozumiemy jako przynależność do tej samej "jednostki terytorialnej". Kolejno: Ulica < Miasto < Województwo. Jest to duże uproszczenie i całość możnaby rozwinąć korzystając z baz do przechowywania danych geograficznych i korzystając z Google Maps API po stronie klienta.
 
-W projekcie dodatkowo zakładamy, że każda osoba, która osiągnie wiek emerytalny przechodzi automatycznie na emeryturę, co w rzeczywistoście nie zawsze ma miejsce
+W projekcie dodatkowo zakładamy, że każda osoba, która osiągnie wiek emerytalny przechodzi automatycznie na emeryturę, co w rzeczywistości nie zawsze ma miejsce.
 
 ## Więzy integralności
-Wiele tabel odwołuje się do tabeli __Adresses__. Tabela ta przechowuje informacje o kodach pocztowych i przypisanych im miastach i województwach. Wymogiem dodatkowo narzuconym jest, aby wpisy w tej tabeli istniały wyłącznie jeśli przynajmniej jeden obiekt odnosi się do danego wpisu. Tzn. Po usunięciu ostateniego elementu, którego adres ma dany kod pocztowy to zostaje on automatycznie usunięty przez odpowiedni wyzwalacz
+Wiele tabel odwołuje się do tabeli __Adresses__. Tabela ta przechowuje informacje o kodach pocztowych i przypisanych im miastach i województwach. Wymogiem dodatkowo narzuconym jest, aby wpisy w tej tabeli istniały wyłącznie jeśli przynajmniej jeden obiekt odnosi się do danego wpisu. Tzn. po usunięciu ostateniego elementu, którego adres ma dany kod pocztowy to zostaje on automatycznie usunięty przez odpowiedni wyzwalacz.
 
-Większość powiązań między tabelami jest zaznaczona na diagramie dołączonym do specyfikacji lub będzie dopowiedzniana w trakcie obrony projektu.
+Większość powiązań między tabelami jest zaznaczona na diagramie dołączonym do specyfikacji lub będzie dopowiedziana w trakcie obrony projektu.
 
 # Kod SQL
 ## Tabele (20)
