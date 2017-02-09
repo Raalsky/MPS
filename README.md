@@ -314,7 +314,8 @@ ALTER TABLE Users
 ADD CHECK (dbo.isAlphaNumerical(HouseNr) != 0)
 ```
 ## Widoki (5)
-### Widok podający użytkowników z więcej niż jedną rolą
+### Widok UsersWithMoreThanOneRole
+Widok ten podaje PESEL, imię i nazwisko osób, które mogą być jednocześnie na przykład i lekarzami i farmaceutami.
 ```sql
 CREATE VIEW UsersWithMoreThanOneRole
 AS
@@ -324,7 +325,8 @@ GROUP BY PESEL
 HAVING COUNT(*) > 1) AS P
   ON U.PESEL = P.PESEL
 ```
-### Widok pacjentów na emeryturze
+### Widok PatientsRetired
+Wyświetla wszystkie dane o pacjentach na emeryturze. Przyjęliśmy założenie, że kobiety przechodzą na emeryturę po 60 roku życia, a mężczyźni po 65. Również uprościliśmy to zagadnienie do wieku pacjentów (w naszym projekcie zakładamy, że osoba przekraczająca dany wiek przechodzi od razu na emeryturę, co w rzeczywistości nie zawsze ma miejsce).
 ```sql
 CREATE VIEW PatientsRetired AS
 SELECT * FROM Patients
@@ -337,7 +339,8 @@ OR (Gender = 'K' AND
 OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) > 0)
 OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) = 0 AND DATEPART(DD, GETDATE()) - DATEPART(DD, Birth) > 0)))
 ```
-### Widok leków powyżej 50% refundacji
+### Widok MedicinesRefundsMoreThanHalf
+Wyświetla dane dotyczące leków, których procent refundacji jest większy bądź równy od 50%.  Wyliczany na podstawie funkcji __RefundPercent__ (opis funkcji podany niżej). Cena sprawdzana na podstawie kolumny Price z tabeli __PharmaciesProducts__.
 ```sql
 CREATE VIEW MedicinesRefundsMoreThanHalf
 AS
@@ -348,7 +351,8 @@ AS
     ON Pharmacies.Id = PharmaciesProducts.PharmacyId
   WHERE dbo.RefundPercent(MedicineId, Price) >= 50
 ```
-### Widok liczby aptek w każdym mieście
+### Widok PharmaciesAmountGroupedByCity
+Podaje liczbę aptek w każdej miejscowości.
 ```sql
 CREATE VIEW PharmaciesAmountGroupedByCity
 AS
@@ -357,7 +361,8 @@ FROM Pharmacies P JOIN Adresses A
 ON P.PostalCode = A.PostalCode
 GROUP BY City
 ```
-### Widok liczby leków w każdej aptece
+### Widok NumberOfMedicinesInPharmacies
+Podaje identyfikatory i liczbę leków w każdej aptece.
 ```sql
 CREATE VIEW NumberOfMedicinesInPharmacies
 AS
@@ -365,6 +370,7 @@ SELECT Pharmacies.Id, (SELECT COUNT(*) FROM PharmaciesProducts WHERE PharmaciesP
 ```
 ## Typy tablicowe (2)
 ### Typ PrescriptionMedicines
+Typ przyjmowany przy operacji AddPrescription. Zawiera opis recepty w postaci identyfikatora leku, ilości produktów i opisu dawkowania.
 ```sql
 CREATE TYPE PrescriptionMedicines AS TABLE
 (
@@ -374,11 +380,14 @@ CREATE TYPE PrescriptionMedicines AS TABLE
 )
 ```
 ### Typ ConflictedMedicines
+Typ zwracany przy operacji CheckAllergy. Przechowuje listę leków na które jest uczulony dany pacjent.
 ```sql
 CREATE TYPE ConflictedMedicines AS TABLE ( EAN BIGINT );
 ```
 ## Procedury (15)
 ### Procedura __AddUser
+Jedna z najbardziej rozbudowanych procedur. Przedrostek nazwy procedury ma na celu wskazanie, że jest to procedura wykorzystywana wewnętrznie przez inne procedury. Nie powinna zostać uruchamiana bezpośrednio jako zdania SQL. Wstawia podane dane użytkowników do tabeli Users. Sprawdza poprawność wartości PESEL oraz Login (korzysta z funkcji __CheckPESEL__ oraz __isAlphaNumerical__ opisanych dalej w dokumentacji). Nie pozwala dodać użytkownika, którego login już istnieje w bazie. Oraz dodaje do tabeli __Adresses__ dane, jeśli jeszcze w niej nie istnieją.
+ Sama procedura wywoływana jest tylko za pośrednictwem procedur __AddDoctor__, __AddPharmacist__ oraz __AddSaler__.
 ```sql
 CREATE PROCEDURE __AddUser
 (
@@ -554,6 +563,7 @@ BEGIN
 END
 ```
 ### Procedura AddPatient
+Dodaje pacjenta do tabeli Patients. Sprawdza poprawność podanego PESELu. Dodaje do tabeli Adresses dane, jeśli jeszcze w niej nie istnieją.
 ```sql
 CREATE PROCEDURE AddPatient(
   @PESEL CHAR(11),
@@ -593,6 +603,7 @@ BEGIN
 END
 ```
 ### Procedura AddInstitution
+Dodaje instytucję do tabeli Institutions. Dodaje do tabeli Adresses dane, jeśli jeszcze w niej nie istnieją.
 ```sql
 CREATE PROCEDURE AddInstitution
 (
@@ -621,6 +632,7 @@ BEGIN
 END
 ```
 ### Procedura AddPharmacy
+Dodaje aptekę do tabeli Pharmacies. Dodaje do tabeli Adresses dane, jeśli jeszcze w niej nie istnieją.
 ```sql
 CREATE PROCEDURE AddPharmacy
 (
@@ -659,6 +671,7 @@ Przykład:
 AddPharmacy 'Dr. Max', 'apteka ogólnodostępna', 'FA.KR.4102-8240-Z-242-51/2016/130/09', '2016-01-02', '2016-03-25', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9', '2'
 ```
 ### Procedura AddWholesale
+Dodaje hurtownię do tabeli Wholesales. Dodaje do tabeli Adresses dane, jeśli jeszcze w niej nie istnieją.
 ```sql
 CREATE PROCEDURE AddWholesale
 (
@@ -709,6 +722,7 @@ Przykład:
 GetHistory '75092807732'
 ```
 ### Procedura AddOrder
+Najbardziej rozbudowana procedura. Celem jest dodanie zamówienia pomiędzy apteką, a hurtownią. W Procedurach chcieliśmy pokazać różne metody przekazywania listy obiektów przez argumenty. Tutaj lista leków jakie chcemy zamówic przekazywana jest przez ciąg znaków w postaci `'identyfikator_leku[ilość]'` odzielone przecinkami. Procedura sprawdza poprawność wszystkich przekazanych danych.
 ```sql
 CREATE PROCEDURE AddOrder
 (
