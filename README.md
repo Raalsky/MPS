@@ -82,7 +82,7 @@ CREATE TABLE EventsTypes
 CREATE TABLE Institutions
 (
     InstitutionId INT PRIMARY KEY NOT NULL IDENTITY,
-    InsitutionName NVARCHAR(50) NOT NULL,
+    InstitutionName NVARCHAR(50) NOT NULL,
     PostalCode CHAR(6) NOT NULL,
     Prefix NVARCHAR(3),
     Street NVARCHAR(25),
@@ -149,6 +149,7 @@ CREATE TABLE Orders
     WholesaleId INT,
     PharmacyId INT,
     OrderDate DATE NOT NULL,
+    CompletionDate DATE DEFAULT NULL,
     CONSTRAINT Orders_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id),
     CONSTRAINT Orders_Pharmacies_Id_fk FOREIGN KEY (PharmacyId) REFERENCES Pharmacies (Id)
 );
@@ -168,6 +169,7 @@ CREATE TABLE Patients
     HouseNr VARCHAR(5),
     FlatNr VARCHAR(5),
     BloodType NVARCHAR(5),
+    Gender CHAR NOT NULL,
     CONSTRAINT Patients_Adresses_PostalCode_fk FOREIGN KEY (PostalCode) REFERENCES Adresses (PostalCode)
 );
 ```
@@ -308,6 +310,58 @@ CREATE TABLE WholesalesProducts
     CONSTRAINT WholesalesProducts_Wholesales_Id_fk FOREIGN KEY (WholesaleId) REFERENCES Wholesales (Id)
 );
 ```
+## Widoki
+### Widok podający użytkowników z więcej niż jedną rolą
+```sql
+CREATE VIEW UsersWithMoreThanOneRole
+AS
+SELECT DISTINCT U.PESEL, UserName, UserLastName FROM Users U JOIN
+  (SELECT PESEL FROM Users
+GROUP BY PESEL
+HAVING COUNT(*) > 1) AS P
+  ON U.PESEL = P.PESEL
+```
+### Widok pacjentów na emeryturze
+```sql
+CREATE VIEW PatientsRetired AS
+SELECT * FROM Patients
+WHERE (Gender = 'M' AND
+(DATEPART(YY, GETDATE()) - DATEPART(YY,Birth) > 65
+OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 65 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) > 0)
+OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 65 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) = 0 AND DATEPART(DD, GETDATE()) - DATEPART(DD, Birth) > 0)))
+OR (Gender = 'K' AND
+(DATEPART(YY, GETDATE()) - DATEPART(YY,Birth) > 60
+OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) > 0)
+OR (DATEPART(YY, GETDATE()) - DATEPART(YY, Birth) = 60 AND DATEPART(MM, GETDATE()) - DATEPART(MM, Birth) = 0 AND DATEPART(DD, GETDATE()) - DATEPART(DD, Birth) > 0)))
+```
+
+### Widok leków powyżej 50% refundacji
+```sql
+CREATE VIEW MedicinesRefundsMoreThanHalf
+AS
+  SELECT dbo.RefundPercent(MedicineId, Price) Refund, Medicines.Name MedicineName, CommonName, PharmacyId, Pharmacies.Name PharmacyName, Price  FROM PharmaciesProducts
+    JOIN Medicines
+    ON PharmaciesProducts.MedicineId = Medicines.EAN
+    JOIN Pharmacies
+    ON Pharmacies.Id = PharmaciesProducts.PharmacyId
+  WHERE dbo.RefundPercent(MedicineId, Price) >= 50
+```
+
+### Widok liczby aptek w każdym mieście
+```sql
+CREATE VIEW PharmaciesAmountGroupedByCity
+AS
+SELECT City, COUNT(*) AmountOfPharmacies
+FROM Pharmacies P JOIN Adresses A
+ON P.PostalCode = A.PostalCode
+GROUP BY City
+```
+### Widok liczby leków w każdej aptece
+```sql
+CREATE VIEW NumberOfMedicinesInPharmacies
+AS
+SELECT Pharmacies.Id, (SELECT COUNT(*) FROM PharmaciesProducts WHERE PharmaciesProducts.PharmacyId = Pharmacies.Id) NumberOfMedicines FROM Pharmacies
+```
 
 ## Procedury
 ### Procedura __AddUser
@@ -373,7 +427,6 @@ CREATE PROCEDURE AddDoctor(
   @Login NVARCHAR(25),
   @Password NVARCHAR(25),
   @PESEL CHAR(11),
-  @GroupNr INT,
   @UserName NVARCHAR(25),
   @UserLastName NVARCHAR(25),
   @Birth DATE,
@@ -395,7 +448,7 @@ BEGIN
         ROLLBACK TRANSACTION [DoctorCreation];
       END
     ELSE
-    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    EXEC __AddUser @Login,@Password,@PESEL,1,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
     DECLARE @UserId INT
     SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
     INSERT INTO Doctors (UserId, InstitutionId, Branch, EmploymentDate) VALUES (@UserId, @InstitutionId, @Branch, GETDATE());
@@ -422,7 +475,8 @@ CREATE PROCEDURE AddPatient(
   @Street NVARCHAR(25),
   @HouseNr VARCHAR(5),
   @FlatNr VARCHAR(5),
-  @BloodType NVARCHAR(5)
+  @BloodType NVARCHAR(5),
+  @Gender CHAR(1)
 )
   AS
 BEGIN
@@ -436,8 +490,8 @@ BEGIN
     ELSE
     IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
       INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
-    INSERT INTO Patients (PESEL, PatientName, PatientLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr, BloodType)
-    VALUES (@PESEL, @PatientName, @PatientLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr, @BloodType);
+    INSERT INTO Patients (PESEL, PatientName, PatientLastName, Birth, PostalCode, Prefix, Street, HouseNr, FlatNr, BloodType, Gender)
+    VALUES (@PESEL, @PatientName, @PatientLastName, @Birth, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr, @BloodType, @Gender);
     COMMIT TRANSACTION [PatientCreation];
   END TRY
   BEGIN CATCH
@@ -483,6 +537,8 @@ CREATE PROCEDURE AddPharmacy
   @Name NVARCHAR(50),
   @Type NVARCHAR(30),
   @AuthorizationNr VARCHAR(40),
+  @CreationDate DATE,
+  @AuthorizationDate DATE,
   @PostalCode CHAR(6),
   @Province NVARCHAR(25),
   @City NVARCHAR(25),
@@ -497,8 +553,9 @@ BEGIN
     BEGIN TRY
       IF NOT EXISTS (SELECT PostalCode FROM Adresses WHERE PostalCode = @PostalCode)
         INSERT INTO Adresses (PostalCode, Province, City) VALUES (@PostalCode, @Province, @City);
-      INSERT INTO Pharmacies (Name, Type, AuthorizationNr, PostalCode, Prefix, Street, HouseNr, FlatNr)
-          VALUES (@Name, @Type, @AuthorizationNr, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
+      PRINT 'TEST'
+      INSERT INTO Pharmacies (Name, Type, AuthorizationNr, CreationDate, AuthorizationDate, PostalCode, Prefix, Street, HouseNr, FlatNr)
+          VALUES (@Name, @Type, @AuthorizationNr, @CreationDate, @AuthorizationDate, @PostalCode, @Prefix, @Street, @HouseNr, @FlatNr)
       COMMIT TRANSACTION [PharmacyCreation];
     END TRY
     BEGIN CATCH
@@ -506,6 +563,10 @@ BEGIN
       ROLLBACK TRANSACTION [PharmacyCreation];
     END CATCH
 END
+```
+Przykład:
+```sql
+AddPharmacy 'Dr. Max', 'apteka ogólnodostępna', 'FA.KR.4102-8240-Z-242-51/2016/130/09', '2016-01-02', '2016-03-25', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9', '2'
 ```
 
 ### Procedura AddWholesale
@@ -537,6 +598,10 @@ BEGIN
     END CATCH
 END
 ```
+Przykład:
+```sql
+AddWholesale 'Adrianella', 'GIF-N-422/722-1/MSH/06', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9'
+```
 
 ### AddPharmacist
 ```sql
@@ -545,7 +610,6 @@ CREATE PROCEDURE AddPharmacist(
   @Login NVARCHAR(25),
   @Password NVARCHAR(25),
   @PESEL CHAR(11),
-  @GroupNr INT,
   @UserName NVARCHAR(25),
   @UserLastName NVARCHAR(25),
   @Birth DATE,
@@ -567,7 +631,7 @@ BEGIN
         ROLLBACK TRANSACTION [PharmacistCreation];
       END
     ELSE
-    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    EXEC __AddUser @Login,@Password,@PESEL,2,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
     DECLARE @UserId INT
     SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
     INSERT INTO Pharmacists (UserId, PharmacyId, EmploymentDate) VALUES (@UserId, @PharmacyId, GETDATE());
@@ -587,7 +651,6 @@ CREATE PROCEDURE AddSaler(
   @Login NVARCHAR(25),
   @Password NVARCHAR(25),
   @PESEL CHAR(11),
-  @GroupNr INT,
   @UserName NVARCHAR(25),
   @UserLastName NVARCHAR(25),
   @Birth DATE,
@@ -609,7 +672,7 @@ BEGIN
         ROLLBACK TRANSACTION [SalerCreation];
       END
     ELSE
-    EXEC __AddUser @Login,@Password,@PESEL,@GroupNr,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    EXEC __AddUser @Login,@Password,@PESEL,3,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
     DECLARE @UserId INT
     SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
     INSERT INTO Salers (UserId, WholesaleId, EmploymentDate) VALUES (@UserId, @WholesaleId, GETDATE());
@@ -634,14 +697,13 @@ BEGIN
   ON ET.EventTypeId = MEET.EventType
 END
 ```
+Przykład:
+```sql
+GetHistory '75092807732'
+```
 
 ### Procedura AddOrder
 ```sql
-USE mps;
-GO
-IF OBJECT_ID ( 'AddOrder', 'P' ) IS NOT NULL
-    DROP PROCEDURE AddOrder;
-GO
 CREATE PROCEDURE AddOrder
 (
   @WholesaleId INT,
@@ -718,13 +780,67 @@ Przykład:
 AddOrder 2, 92, '5055565711958[4],4037353010604[12],4037353010604[1]'
 ```
 
+### Procedura AddPrescription
+```sql
+CREATE TYPE PrescriptionMedicines AS TABLE
+(
+  EAN BIGINT,
+  Quantity INT,
+  Description TEXT
+)
+
+CREATE PROCEDURE AddPrescription
+(
+  @PatientId CHAR(11),
+  @DoctorId INT,
+  @Medicines PrescriptionMedicines READONLY
+)
+AS
+BEGIN
+  BEGIN TRANSACTION [AddPrescription]
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Patients.PESEL FROM Patients WHERE Patients.PESEL = @PatientId)
+      RAISERROR('Podany pacjent nie istnieje',16,60)
+    IF NOT EXISTS(SELECT UserId FROM Doctors WHERE UserId = @DoctorId)
+      RAISERROR('Podany lekarz nie istnieje',16,61)
+    IF NOT EXISTS(SELECT PatientId FROM DoctorsAndPatientsRelation WHERE PatientId = @PatientId AND DoctorId = @DoctorId)
+      RAISERROR('Podany pacjent nie jest przypisany do podanego lekarza',16,62)
+
+    DECLARE @tableTMP ConflictedMedicines
+    INSERT INTO @tableTMP (EAN) SELECT EAN FROM @Medicines
+    IF EXISTS(SELECT * FROM dbo.CheckAllergy(@PatientId, @tableTMP))
+    BEGIN
+      SELECT * FROM dbo.CheckAllergy(@PatientId, @tableTMP)
+      RAISERROR('Pacjent jest uczulony na jeden z podanych leków',16,60);
+    END
+
+    INSERT INTO Prescriptions (PatientId, PrescriptionDate, DoctorId) VALUES (@PatientId, GETDATE(), @DoctorId)
+    DECLARE @PrescriptionId INT = SCOPE_IDENTITY()
+    INSERT INTO PrescriptionDetails (PrescriptionId, MedicineId, Description) SELECT @PrescriptionId, EAN, Description FROM @Medicines
+
+  COMMIT TRANSACTION [AddPrescription]
+  END TRY
+  BEGIN CATCH
+    SELECT ERROR_MESSAGE() AS ErrorMessage
+    ROLLBACK TRANSACTION [AddPrescription]
+  END CATCH
+END
+GO
+```
+Przykład:
+```sql
+DECLARE @tableTMP PrescriptionMedicines
+INSERT INTO @tableTMP VALUES ('4037353010604',1,'2 razy dziennie')
+INSERT INTO @tableTMP VALUES ('5055565711958',1,NULL)
+EXEC AddPrescription '75092807732', 11, @tableTMP
+
+SELECT * FROM Prescriptions
+SELECT * FROM PrescriptionDetails
+SELECT * FROM PharmaciesProducts
+```
+
 ### Procedura AddWholesaleProduct
 ```sql
-USE mps;
-GO
-IF OBJECT_ID ( 'AddWholesaleProduct', 'P' ) IS NOT NULL
-    DROP PROCEDURE AddWholesaleProduct;
-GO
 CREATE PROCEDURE AddWholesaleProduct
 (
   @WholesaleId INT,
@@ -750,14 +866,13 @@ BEGIN
   END CATCH
 END
 ```
+Przykład:
+```sql
+AddWholesaleProduct 4, 5055565711957, 28.99
+```
 
 ### Procedura AddPharmacyProduct
 ```sql
-USE mps;
-GO
-IF OBJECT_ID ( 'AddPharmacyProduct', 'P' ) IS NOT NULL
-    DROP PROCEDURE AddPharmacyProduct;
-GO
 CREATE PROCEDURE AddPharmacyProduct
 (
   @PharmacyId INT,
@@ -782,4 +897,177 @@ BEGIN
     SELECT ERROR_MESSAGE() AS ErrorMessage
   END CATCH
 END
+```
+Przykład:
+```sql
+AddPharmacyProduct 145, 5055565711958, 30.99
+```
+
+### Procedura NearestMedicines
+```sql
+CREATE PROCEDURE NearestMedicines (@PrescriptionId INT)
+AS
+BEGIN
+  SELECT MedicineId, dbo.NearestPharmacy(PatientId, MedicineId) FROM PrescriptionDetails JOIN Prescriptions ON PrescriptionDetails.PrescriptionId = Prescriptions.PrescriptionId WHERE Prescriptions.PrescriptionId = @PrescriptionId
+END
+```
+Przykład:
+```sql
+NearestMedicines 3
+```
+
+### Procedura AVGProductPriceInAllWholesales
+```sql
+CREATE PROCEDURE AVGProductPriceInAllWholesales(@Product BIGINT)
+AS
+BEGIN
+  SELECT AVG(Price) FROM Medicines M JOIN WholesalesProducts WP
+  ON M.EAN = WP.MedicineId
+  WHERE M.EAN = @Product
+END
+```
+
+## Funkcje
+### Funkcja GetAddress
+```sql
+CREATE FUNCTION dbo.GetAddress(@PostalCode CHAR(6), @Prefix NVARCHAR(3), @Street NVARCHAR(25), @HouseNr VARCHAR(5), @FlatNr VARCHAR(5))
+RETURNS NVARCHAR(200)
+AS
+-- Funkcja zwraca pełny adres jako ciąg znaków i pobiera miejscowość na podstawie kodu pocztowego --
+BEGIN
+  DECLARE @City NVARCHAR(25);
+  DECLARE @Result NVARCHAR(200);
+  -- Możliwe, że danego miasta nie ma w tabeli adresów --
+  IF EXISTS (SELECT City FROM Adresses WHERE PostalCode = @PostalCode)
+    SELECT @City = City FROM Adresses WHERE PostalCode = @PostalCode
+  SET @Result = @PostalCode + ' ' + @city + ' ' + @Prefix + ' ' + @Street + ' ' + @HouseNr
+  IF @FlatNr != ''
+    SET @Result = @Result + '/' + @FlatNr
+  RETURN @Result;
+END
+```
+Przykład:
+```sql
+SELECT dbo.GetAddress(PostalCode, Prefix, Street, HouseNr, FlatNr) FROM Users;
+```
+
+### Funkcja CheckAllergy
+```sql
+CREATE FUNCTION CheckAllergy (@PESEL CHAR(11), @Medicines ConflictedMedicines READONLY)
+RETURNS @Tab TABLE (Medicines BIGINT)
+AS
+BEGIN
+  INSERT INTO @Tab
+    SELECT M.EAN FROM @Medicines M
+    JOIN (SELECT MedicineId FROM Patients P JOIN Allergies A ON P.PESEL = A.PatientId WHERE @PESEL = A.PatientId) AS B
+    ON M.EAN = B.MedicineId
+  RETURN
+END
+```
+
+### Funkcja RefundPercent
+```sql
+CREATE FUNCTION dbo.RefundPercent(@EAN BIGINT, @Price FLOAT)
+RETURNS FLOAT
+AS
+BEGIN
+  DECLARE @Result FLOAT = 0.0
+  DECLARE @RefundValue FLOAT
+  IF NOT EXISTS(SELECT EAN FROM Medicines WHERE EAN = @EAN)
+    SET @RefundValue = 0.0
+  ELSE
+    SELECT @RefundValue = RefundValue FROM Medicines WHERE EAN = @EAN
+  SET @Result = 100 - ((@Price - @RefundValue) / @Price * 100)
+  RETURN @Result
+END
+```
+Przykład:
+```sql
+SELECT TOP 1 dbo.RefundPercent(EAN,100.0) FROM Medicines
+```
+
+### Funkcja isAlphaNumerical
+```sql
+CREATE FUNCTION dbo.isAlphaNumerical(@str NVARCHAR(100))
+RETURNS INT
+AS
+  --- Funkcja zwraca 1 jeśli dany ciąg składa się wyłącznie z liter i cyfr
+BEGIN
+  DECLARE @Result int
+  IF PATINDEX('%[^a-zA-Z0-9]%' , @str) = 0
+    SET @Result = 1
+  ELSE
+    SET @Result = 0
+  RETURN @Result
+END
+```
+Przykład:
+```sql
+SELECT dbo.isAlphaNumerical(Login) FROM Users
+```
+
+### Funkcja CheckPESEL
+```sql
+CREATE FUNCTION CheckPESEL (@PESEL CHAR(11))
+RETURNS INT
+AS
+BEGIN
+  DECLARE @OK BIT = 0;
+  DECLARE @sum INT = 0;
+  DECLARE @i INT = 1;
+  DECLARE @p INT = 9;
+  WHILE @i <= 10
+    BEGIN
+      SET @sum += @p * CAST( SUBSTRING(@PESEL,@i,1) AS INT );
+      SET @p -= 2;
+      IF(@p <= 0)
+        SET @p = 9;
+      IF @p = 5
+        SET @p -= 2;
+      SET @i += 1;
+    END
+  SET @sum %= 10;
+  IF @sum = CAST( SUBSTRING(@PESEL,11,1) AS INT )
+    SET @OK = 1;
+RETURN @OK;
+END
+```
+
+### Funkcja NearestPharmacy
+```sql
+CREATE FUNCTION dbo.NearestPharmacy(@PatientId CHAR(11), @EAN BIGINT)
+RETURNS INT
+AS
+BEGIN
+  DECLARE @PostalCode CHAR(6)
+  DECLARE @Prefix NVARCHAR(3)
+  DECLARE @Street NVARCHAR(25)
+  DECLARE @Province NVARCHAR(25)
+  DECLARE @PharmacyId INT
+  SELECT @PostalCode = PostalCode, @Prefix = Prefix, @Street = Street FROM Patients WHERE PESEL = @PatientId
+  SELECT @Province = Province FROM Adresses WHERE PostalCode = @PostalCode
+
+  IF EXISTS(SELECT * FROM Pharmacies AS P JOIN PharmaciesProducts AS PP ON P.Id = PP.PharmacyId WHERE PostalCode = @PostalCode AND Prefix = @Prefix AND Street = @Street AND PP.MedicineId = @EAN)
+  BEGIN
+    SELECT TOP 1 @PharmacyId = Id FROM Pharmacies AS P JOIN PharmaciesProducts AS PP ON P.Id = PP.PharmacyId
+      WHERE PostalCode = @PostalCode AND Prefix = @Prefix AND Street = @Street AND PP.MedicineId = @EAN
+      ORDER BY PP.Price ASC
+  END
+  ELSE IF EXISTS(SELECT * FROM Pharmacies AS P JOIN PharmaciesProducts AS PP ON P.Id = PP.PharmacyId WHERE PostalCode = @PostalCode AND PP.MedicineId = @EAN)
+    SELECT TOP 1 @PharmacyId = Id FROM Pharmacies AS P JOIN PharmaciesProducts AS PP ON P.Id = PP.PharmacyId
+      WHERE PostalCode = @PostalCode AND PP.MedicineId = @EAN
+      ORDER BY PP.Price ASC
+  ELSE IF EXISTS(SELECT * FROM Pharmacies AS P JOIN Adresses AS A ON P.PostalCode = A.PostalCode JOIN PharmaciesProducts AS PP ON PP.PharmacyId = P.id WHERE A.Province = @Province AND PP.MedicineId = @EAN)
+    SELECT TOP 1 @PharmacyId = P.Id FROM Pharmacies AS P JOIN Adresses AS A ON P.PostalCode = A.PostalCode
+      JOIN PharmaciesProducts AS PP ON PP.PharmacyId = P.id
+      WHERE A.Province = @Province AND PP.MedicineId = @EAN
+      ORDER BY Price
+  ELSE
+    RETURN NULL
+  RETURN @PharmacyId
+END
+```
+Przykład:
+```sql
+SELECT dbo.NearestPharmacy('75092807732', MedicineId) FROM PharmaciesProducts
 ```
