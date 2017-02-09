@@ -473,6 +473,86 @@ BEGIN
   END CATCH
 END
 ```
+### Procedura AddPharmacist
+```sql
+CREATE PROCEDURE AddPharmacist(
+  @PharmacyId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [PharmacistCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
+      BEGIN
+        RAISERROR('Nie ma takiej apteki',16,34);
+        ROLLBACK TRANSACTION [PharmacistCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,2,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Pharmacists (UserId, PharmacyId, EmploymentDate) VALUES (@UserId, @PharmacyId, GETDATE());
+    COMMIT TRANSACTION [PharmacistCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia farmaceuty',16,1);
+    ROLLBACK TRANSACTION [PharmacistCreation];
+  END CATCH
+END
+```
+### Procedura AddSaler
+```sql
+CREATE PROCEDURE AddSaler(
+  @WholesaleId INT,
+  @Login NVARCHAR(25),
+  @Password NVARCHAR(25),
+  @PESEL CHAR(11),
+  @UserName NVARCHAR(25),
+  @UserLastName NVARCHAR(25),
+  @Birth DATE,
+  @PostalCode CHAR(6),
+  @Province NVARCHAR(25),
+  @City NVARCHAR(25),
+  @Prefix NVARCHAR(3),
+  @Street NVARCHAR(25),
+  @HouseNr VARCHAR(5),
+  @FlatNr VARCHAR(5)
+)
+  AS
+BEGIN
+  BEGIN TRANSACTION [SalerCreation];
+  BEGIN TRY
+    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
+      BEGIN
+        RAISERROR('Nie ma takiej hurtowni',16,34);
+        ROLLBACK TRANSACTION [SalerCreation];
+      END
+    ELSE
+    EXEC __AddUser @Login,@Password,@PESEL,3,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
+    DECLARE @UserId INT
+    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
+    INSERT INTO Salers (UserId, WholesaleId, EmploymentDate) VALUES (@UserId, @WholesaleId, GETDATE());
+    COMMIT TRANSACTION [SalerCreation];
+  END TRY
+  BEGIN CATCH
+    RAISERROR('Błąd podczas tworzenia pracownika hurtowni',16,1);
+    ROLLBACK TRANSACTION [SalerCreation];
+  END CATCH
+END
+```
 ### Procedura AddPatient
 ```sql
 CREATE PROCEDURE AddPatient(
@@ -610,86 +690,6 @@ END
 Przykład:
 ```sql
 AddWholesale 'Adrianella', 'GIF-N-422/722-1/MSH/06', '33-350', 'małopolskie', 'Kraków', 'ul.', 'Zachodnia', '9'
-```
-### Procedura AddPharmacist
-```sql
-CREATE PROCEDURE AddPharmacist(
-  @PharmacyId INT,
-  @Login NVARCHAR(25),
-  @Password NVARCHAR(25),
-  @PESEL CHAR(11),
-  @UserName NVARCHAR(25),
-  @UserLastName NVARCHAR(25),
-  @Birth DATE,
-  @PostalCode CHAR(6),
-  @Province NVARCHAR(25),
-  @City NVARCHAR(25),
-  @Prefix NVARCHAR(3),
-  @Street NVARCHAR(25),
-  @HouseNr VARCHAR(5),
-  @FlatNr VARCHAR(5)
-)
-  AS
-BEGIN
-  BEGIN TRANSACTION [PharmacistCreation];
-  BEGIN TRY
-    IF NOT EXISTS(SELECT Id FROM Pharmacies WHERE Id = @PharmacyId)
-      BEGIN
-        RAISERROR('Nie ma takiej apteki',16,34);
-        ROLLBACK TRANSACTION [PharmacistCreation];
-      END
-    ELSE
-    EXEC __AddUser @Login,@Password,@PESEL,2,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
-    DECLARE @UserId INT
-    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
-    INSERT INTO Pharmacists (UserId, PharmacyId, EmploymentDate) VALUES (@UserId, @PharmacyId, GETDATE());
-    COMMIT TRANSACTION [PharmacistCreation];
-  END TRY
-  BEGIN CATCH
-    RAISERROR('Błąd podczas tworzenia farmaceuty',16,1);
-    ROLLBACK TRANSACTION [PharmacistCreation];
-  END CATCH
-END
-```
-### Procedura AddSaler
-```sql
-CREATE PROCEDURE AddSaler(
-  @WholesaleId INT,
-  @Login NVARCHAR(25),
-  @Password NVARCHAR(25),
-  @PESEL CHAR(11),
-  @UserName NVARCHAR(25),
-  @UserLastName NVARCHAR(25),
-  @Birth DATE,
-  @PostalCode CHAR(6),
-  @Province NVARCHAR(25),
-  @City NVARCHAR(25),
-  @Prefix NVARCHAR(3),
-  @Street NVARCHAR(25),
-  @HouseNr VARCHAR(5),
-  @FlatNr VARCHAR(5)
-)
-  AS
-BEGIN
-  BEGIN TRANSACTION [SalerCreation];
-  BEGIN TRY
-    IF NOT EXISTS(SELECT Id FROM Wholesales WHERE Id = @WholesaleId)
-      BEGIN
-        RAISERROR('Nie ma takiej hurtowni',16,34);
-        ROLLBACK TRANSACTION [SalerCreation];
-      END
-    ELSE
-    EXEC __AddUser @Login,@Password,@PESEL,3,@UserName,@UserLastName,@Birth,@PostalCode,@Province,@City,@Prefix,@Street,@HouseNr,@FlatNr
-    DECLARE @UserId INT
-    SET @UserId = (SELECT UserId FROM Users WHERE Login = @Login)
-    INSERT INTO Salers (UserId, WholesaleId, EmploymentDate) VALUES (@UserId, @WholesaleId, GETDATE());
-    COMMIT TRANSACTION [SalerCreation];
-  END TRY
-  BEGIN CATCH
-    RAISERROR('Błąd podczas tworzenia pracownika hurtowni',16,1);
-    ROLLBACK TRANSACTION [SalerCreation];
-  END CATCH
-END
 ```
 ### Procedura GetHistory
 ```sql
