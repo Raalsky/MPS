@@ -442,6 +442,8 @@ Przykład:
 __AddUser 'anowak2@','annanowak123','96042108611',2,'Anna','Nowak','1996-03-22','32-330','małopolskie','Kraków','ul.','Marszałkowska','7B','6'
 ```
 ### Procedura AddDoctor
+Dodaje dla podanych argumentów lekarza do tabeli __Doctors__ oraz za pośrednictwem procedury __\__AddUser__ do tabeli __Users__. 
+ Sprawdza czy argument __InstitutionId__ istnieje w tabeli __Institutions__. Z założenia lekarze muszą należeć do jakiejś instytucji.
 ```sql
 CREATE PROCEDURE AddDoctor(
   @InstitutionId INT,
@@ -483,6 +485,8 @@ BEGIN
 END
 ```
 ### Procedura AddPharmacist
+Dodaje dla podanych argumentów farmaceutę do tabeli __Pharmacists__ oraz za pośrednictwem procedury __\__AddUser__ do tabeli __Users__. 
+ Sprawdza czy argument __PharmacyId__ istnieje w tabeli __Pharmacies__. Z założenia farmaceuci muszą należeć do jakiejś apteki.
 ```sql
 CREATE PROCEDURE AddPharmacist(
   @PharmacyId INT,
@@ -523,6 +527,8 @@ BEGIN
 END
 ```
 ### Procedura AddSaler
+Dodaje dla podanych argumentów pracownika hurtowni do tabeli __Salers__ oraz za pośrednictwem procedury __\__AddUser__ do tabeli __Users__. 
+ Sprawdza czy argument __WholesaleId__ istnieje w tabeli __Wholesales__. Z założenia pracownicy hurtowni muszą należeć do jakiejś hurtowni.
 ```sql
 CREATE PROCEDURE AddSaler(
   @WholesaleId INT,
@@ -800,6 +806,7 @@ Przykład:
 AddOrder 2, 92, '5055565711958[4],4037353010604[12],4037353010604[1]'
 ```
 ### Procedura AddPrescription
+Jedna z bardziej rozbudowanych procedur składowanych. W stosunku do np. procedury __AddOrder__ przyjmuje jako argument tabelę. Stworzony specjalnie w tym celu typ tablicowy przechowuje listę leków wraz z opisem dawkowania i ilością jaką należy zakupić.
 ```sql
 CREATE PROCEDURE AddPrescription
 (
@@ -845,10 +852,6 @@ DECLARE @tableTMP PrescriptionMedicines
 INSERT INTO @tableTMP VALUES ('4037353010604',1,'2 razy dziennie')
 INSERT INTO @tableTMP VALUES ('5055565711958',1,NULL)
 EXEC AddPrescription '75092807732', 11, @tableTMP
-
-SELECT * FROM Prescriptions
-SELECT * FROM PrescriptionDetails
-SELECT * FROM PharmaciesProducts
 ```
 ### Procedura AddWholesaleProduct
 ```sql
