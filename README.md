@@ -22,7 +22,7 @@ Większość danych została przefiltrowana w celu usunięcia wpisów z niepełn
 |Byt|Liczba elementów|
 |:----------:|:-------------:|
 |Tabele|20|
-|Zdefiniowane typy tablicowe|2|
+|[Zdefiniowane typy tablicowe](## Typy tablicowe (2))|2|
 |Widoki|5|
 |Procedury|15|
 |Funkcje|6|
