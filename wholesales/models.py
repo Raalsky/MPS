@@ -26,3 +26,14 @@ class Saler(models.Model):
 
     class Meta:
         db_table    = "Salers"
+
+class WholesaleProduct(models.Model):
+    MedicineId      = models.ForeignKey(
+        'main.Medicine'
+    )
+    WholesaleId     = models.ForeignKey(
+        'Wholesale'
+    )
+    Price           = models.FloatField()
+    class Meta:
+        db_table    = "WholesalesProducts"
