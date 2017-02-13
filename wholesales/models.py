@@ -1,3 +1,28 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+class Wholesale(models.Model):
+    Name            = models.CharField(max_length=50)
+    AuthorizationNr = models.CharField(max_length=40)
+    CreationDate    = models.DateField()
+    PostalCode      = models.ForeignKey(
+        'main.PostalCode'
+    )
+    Street          = models.CharField(max_length=10)
+
+    class Meta:
+        db_table    = "Wholesales"
+
+
+
+class Saler(models.Model):
+    UserId          = models.ForeignKey(
+        User
+    )
+    WholesaleId     = models.ForeignKey(
+        'Wholesale'
+    )
+    EmploymentDate  = models.DateField()
+
+    class Meta:
+        db_table    = "Salers"

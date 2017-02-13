@@ -18,10 +18,10 @@ class Medicine(models.Model):
     class Meta:
         db_table = 'Medicines'
 
-class Address(models.Model):
+class PostalCode(models.Model):
     PostalCode      = models.CharField(primary_key=True,max_length=6)
     Province        = models.CharField(null=False,max_length=25)
     City            = models.CharField(null=False,max_length=25)
 
     class Meta:
-        db_table    = 'Addresses'
+        db_table    = 'PostalCodes'
