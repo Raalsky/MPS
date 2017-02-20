@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import PostalCode, Medicine
+
+admin.site.register(PostalCode)
+admin.site.register(Medicine)

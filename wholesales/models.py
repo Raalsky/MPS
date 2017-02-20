@@ -10,6 +10,9 @@ class Wholesale(models.Model):
     )
     Street          = models.CharField(max_length=10)
 
+    def __str__(self):
+        return self.Name
+
     class Meta:
         db_table    = "Wholesales"
 
@@ -35,5 +38,9 @@ class WholesaleProduct(models.Model):
         'Wholesale'
     )
     Price           = models.FloatField()
+
+    def __str__(self):
+        return str(self.MedicineId.Name)
+
     class Meta:
         db_table    = "WholesalesProducts"
